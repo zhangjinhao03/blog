@@ -1,0 +1,28 @@
+#aside-content .card-tag-cloud a:nth-child(6n + 1) {
+  color: #ff6b6b !important;
+}
+
+#aside-content .card-tag-cloud a:nth-child(6n + 2) {
+  color: #f7b731 !important;
+}
+
+#aside-content .card-tag-cloud a:nth-child(6n + 3) {
+  color: #26de81 !important;
+}
+
+#aside-content .card-tag-cloud a:nth-child(6n + 4) {
+  color: #45aaf2 !important;
+}
+
+#aside-content .card-tag-cloud a:nth-child(6n + 5) {
+  color: #a55eea !important;
+}
+
+#aside-content .card-tag-cloud a:nth-child(6n) {
+  color: #fd79a8 !important;
+}
+
+#aside-content .card-tag-cloud a:hover {
+  color: var(--theme-color) !important;
+  transform: scale(1.08);
+}

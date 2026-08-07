@@ -17,7 +17,7 @@ cover: /img/img6.jpg
 
 ## 1.Git工作流程
 
-![流程图](./git-help/流程图.jpg)
+![流程图](流程图.jpg)
 
 注：
 
@@ -57,7 +57,7 @@ Remote：远程仓库
 
   下图直观的阐述了四个区域之间的关系。
 
-![工作流程](./git-help/工作流程.jpg)
+![工作流程](工作流程.jpg)
 
 ## 2.Git环境配置
 
@@ -108,11 +108,11 @@ ssh是一个秘钥，其中，`id_rsa`是你这台电脑的私人秘钥，不能
 
 在github.com界面点击右上角的个人头像会弹出菜单，
 
-![image-20241014200929001](./git-help/image-20241014200929001.png)
+![image-20241014200929001](image-20241014200929001.png)
 
 点击setting，找到SSH keys的设置选项，点击`New SSH key`把你的`id_rsa.pub`里面的信息复制进去。
 
-![image-20241014195518574](./git-help/image-20241014195518574.png)
+![image-20241014195518574](image-20241014195518574.png)
 
 密钥标题什么都可以，完成后点击 `Add SSH key`。
 
@@ -150,9 +150,9 @@ cat ~/.ssh/id_rsa.pub
 
 将其内容复制. 粘贴到Gerrit的配置界面
 
-![image-20241015111720466](./git-help/image-20241015111720466.png)
+![image-20241015111720466](image-20241015111720466.png)
 
-![image-20241014200311500](./git-help/image-20241014200311500.png)
+![image-20241014200311500](image-20241014200311500.png)
 
 **配置本地信息**
 
@@ -232,7 +232,7 @@ git push --tags        #上传所有标签
 
 HEAD，它始终指向当前所处分支的最新的提交点。你所处的分支变化了，或者产生了新的提交点，HEAD就会跟着改变。
 
-![HEAD](./git-help/HEAD.jpg)
+![HEAD](HEAD.jpg)
 
 ### branch
 
@@ -269,7 +269,7 @@ git push origin --delete <branch-name>      #删除远程分支
 
 ### add
 
-![123456](./git-help/123456.jpg)
+![123456](123456.jpg)
 
 add相关命令是实现将工作区修改的内容提交到暂存区，交由git管理。
 
@@ -281,7 +281,7 @@ git add <file>     #添加指定文件到暂存区
 
 ### commit
 
-![123456](./git-help/123456.jpg)
+![123456](123456.jpg)
 
 commit实现将暂存区的内容提交到本地仓库，并使当前分支的HEAD向后移动一个提交点
 
@@ -293,7 +293,7 @@ git commit --amend <message> #使用一次新的commit，替代上一次提交
 
 ### push
 
-![push.](./git-help/push..jpg)
+![push.](push..jpg)
 
 上传本地仓库分支到远程仓库分支，实现同步。
 
@@ -376,7 +376,7 @@ git commit --amend #覆盖上一次提交
 
 merge命令把不同的分支合并起来
 
-![23456](./git-help/23456.jpg)
+![23456](23456.jpg)
 
 如上图，在实际开发过程中，我们可能从master分支中切出一个分支，然后进行开发完成需求，中间经过R3，R4，R5的commit记录，最后开发完成需要合入到master中，这便用到了merge。
 
@@ -393,7 +393,7 @@ rebase又称为衍合，是合并的另外一种选择。
 
 如下图：
 
-![rebaseShow](./git-help/rebaseShow.jpg)
+![rebaseShow](rebaseShow.jpg)
 
 在开始阶段我们处于new分支上，执行命令：
 
@@ -407,15 +407,15 @@ git rebase local
 
 现在我们有这样的两个分支,test和master，提交如下：      
 
-![origin](./git-help/origin.jpg)
+![origin](origin.jpg)
 
 在master执行`git merge test`,然后会得到如下结果：   
 
-![merge](./git-help/merge.jpg)
+![merge](merge.jpg)
 
 在master执行`git rebase test`，然后得到如下结果：
 
-![rebase](./git-help/rebase.jpg)
+![rebase](rebase.jpg)
 
 可以看到，merge操作会生成一个新的节点，之前的提交分开显示。而rebase操作不会生成新的节点，是将两个分支融合成一个线性的提交。如果你想要一个干净的，没有merge commit的线性历史树，那么你应该选择git rebase如果你想保留完整的历史记录，并且想要避免重写commit history的风险，你应该选择使用git merge
 
@@ -439,7 +439,7 @@ git commit -am "update readme"
 git revert 15df9b6
 ```
 
-![revert](./git-help/revert.jpg)
+![revert](revert.jpg)
 
 ### reset和revert的区别
 
@@ -695,7 +695,7 @@ git push ssh://用户名``@gerrit.pt.mioffice.cn:29418``/platform/frameworks/bas
 
 如果提交成功，会有 "SUCCESS" 提示，并附带change link,如下图：
 
-![image-20241015111258229](./git-help/image-20241015111258229.png)
+![image-20241015111258229](image-20241015111258229.png)
 
 ###### 快捷方式:
 
@@ -741,7 +741,7 @@ git push ssh://chengyang@gerrit.pt.mioffice.cn:29418/platform/frameworks/ex refs
 
 同样, 提交成功后有 "SUCCESS" 提示，并附带change link：
 
-![image-20241015111531042](./git-help/image-20241015111531042.png)
+![image-20241015111531042](image-20241015111531042.png)
 
 
 
@@ -751,7 +751,7 @@ git push ssh://chengyang@gerrit.pt.mioffice.cn:29418/platform/frameworks/ex refs
 
 2.复制[bbm](https://bbm.pt.miui.com/releases)上的`复制全部`按钮初始化下载
 
-![image-20241015111832531](./git-help/image-20241015111832531.png)
+![image-20241015111832531](image-20241015111832531.png)
 
 3.使用`repo sync -cd --no-tags`命令下载代码. 理想情况下, 下载代码应该在50分钟左右完成. 如果你下载代码十分慢且痛苦. [可以参考这篇文档](https://xiaomi.f.mioffice.cn/docs/dock4tc9d5fk4bb2dFnchlppZVg#)
 
@@ -769,7 +769,7 @@ git push ssh://chengyang@gerrit.pt.mioffice.cn:29418/platform/frameworks/ex refs
 
 处理过程：git push——>git status .——>git diff，然后就可能会出现：
 
-![image-20241015140854352](./git-help/image-20241015140854352.png)
+![image-20241015140854352](image-20241015140854352.png)
 
 因为基准的代码有一行删除掉了，并留下了一个空行，所以这里多处一行，那为什么下面一部分不会出现被删除的东西呢？因为之前参考的代码已经修改并合入了(我的提交只是记录修改了哪个部分，没有修改的不会记录)，所以就无法查到被删除的是什么内容，于是没有显示内容。
 
@@ -804,11 +804,11 @@ git push ssh://chengyang@gerrit.pt.mioffice.cn:29418/platform/frameworks/ex refs
 - 执行 `git commit` 命令，Git 会为解决冲突创建一个新的合并提交。在提交信息中，建议添加描述性信息，说明这次提交解决了哪些冲突、修复了什么问题或者包含了什么功能性修改。
 - 验证合并后的代码，确保没有新的功能问题、不引入新的错误或异常。可以进行一些测试，运行应用程序，或者请同事审查代码修改，以确保所有功能和逻辑都按预期工作。
 
-![image-20241015142435004](./git-help/image-20241015142435004.png)
+![image-20241015142435004](image-20241015142435004.png)
 
 #### remote unpack failed: error Missing tree xxx
 
-![image-20241015112148709](./git-help/image-20241015112148709.png)
+![image-20241015112148709](image-20241015112148709.png)
 
 解决方法:
 
@@ -824,19 +824,3 @@ m/master-v -> miui/master-v
 master-v即为要提交的远程分支，因此命令为
  git push ssh://zhangjinhao3@gerrit.pt.mioffice.cn:29418//miui/frameworks/interface HEAD:refs/for/master-v --no-thin
 ```
-
-
-
-
-
-
-
-
-
-参考文章
-
-gerrithttps://xiaomi.f.mioffice.cn/wiki/wikk4ySaLeOnJMLgODdOpfDo7hh
-
-repohttps://wiki.n.miui.com/pages/viewpage.action?pageId=411106638
-
-代码冲突https://wiki.n.miui.com/pages/viewpage.action?pageId=575356327
