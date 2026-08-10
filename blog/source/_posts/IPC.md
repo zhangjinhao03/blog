@@ -231,10 +231,68 @@ wait(nullptr);
 
 ## 2.6 单向 Pipe 示例
 
-文件：
-
-```text
 IPC/Pipe/pipe_01_basic.cpp
+
+```cpp
+#include <unistd.h>
+#include <sys/wait.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+	// 创建匿名管道
+	int pipefd[2];
+
+	if (pipe(pipefd) == -1) {
+		perror("pipe");
+		return 1;
+	}
+	
+	// 创建子进程
+	pid_t pid = fork();
+	
+	if (pid == -1) {
+		perror("fork");
+		return 1;
+	}
+	
+	if (pid == 0) {
+		// 子进程
+		close(pipefd[1]);
+		
+		char buffer[128] = {0};
+		ssize_t n = read(pipefd[0], buffer, sizeof(buffer) - 1);  // -1预留'\0'字符
+		
+		if (n == -1) {
+			perror("read");
+			close(pipefd[0]);
+			return 1;
+		}
+		
+		std::cout << "Child received: " << buffer << std::endl; 
+		close(pipefd[0]);
+		return 0;
+	} else {
+		// 父进程
+		close(pipefd[0]);
+		
+		const char* msg = "hello from parent";
+		ssize_t n = write(pipefd[1], msg, strlen(msg));
+		
+		if (n == -1) {
+			perror("write");
+			close(pipefd[1]);
+			return 1;
+		}
+		
+		close(pipefd[1]);
+		wait(nullptr);
+		
+		std::cout << "Parent done" << std::endl;
+	}
+	
+	return 0;
+}
 ```
 
 功能：
@@ -286,10 +344,98 @@ close(child_to_parent[0]); // 子进程关读端
 
 ## 2.8 双向 Pipe 示例
 
-文件：
-
-```text
 IPC/Pipe/pipe_02_bidirectional.cpp
+
+```cpp
+#include <unistd.h>
+#include <sys/wait.h>
+#include <iostream>
+#include <cstring>
+#include <cctype>
+
+int main() {
+	int parent_to_child[2];
+	int child_to_parent[2];
+	
+	// create pipe
+	if (pipe(parent_to_child) == -1) {
+		perror("pipe parent_to_child");
+		return 1;
+	}
+	
+	if (pipe(child_to_parent) == -1) {
+		perror("pipe child_to_parent");
+		return 1;
+	}
+	
+	// create child process
+	pid_t pid = fork();
+	if (pid == -1) {
+		perror("fork");
+		return 1;
+	}
+	
+	if (pid == 0) {
+		// child
+		std::cout<< "child process start."<<std::endl;
+		close(parent_to_child[1]);
+		close(child_to_parent[0]);
+		char buffer[128] = {0};
+		ssize_t n = read(parent_to_child[0],buffer ,sizeof(buffer) - 1);
+		if(n == -1) {
+			perror("parent_to_child read");
+			close(parent_to_child[0]);
+			close(child_to_parent[1]);
+			return 1;
+		}
+		std::cout<< "child read:" << buffer <<std::endl;
+		
+		const char* msg = "i readed.";
+		ssize_t written = write(child_to_parent[1], msg, strlen(msg));
+		if(written == -1) {
+			perror("child_to_parent write");
+			close(parent_to_child[0]);
+			close(child_to_parent[1]);
+			return 1;
+		}
+		std::cout<< "child write done"<<std::endl;
+		close(parent_to_child[0]);
+		close(child_to_parent[1]);
+	} else {
+		// parent
+		std::cout<< "parent process start."<<std::endl;
+		close(parent_to_child[0]);
+		close(child_to_parent[1]);
+		const char* msg = "hello child!";
+		ssize_t written = write(parent_to_child[1], msg, strlen(msg));
+		if(written == -1) {
+			perror("parent_to_child write");
+			close(parent_to_child[1]);
+			close(child_to_parent[0]);
+			return 1;
+		}
+		std::cout<< "parent write done"<<std::endl;
+
+		char buffer[128] = {0};
+		ssize_t n = read(child_to_parent[0], buffer, sizeof(buffer) - 1);
+		if (n == -1) {
+			perror("child_to_parent read");
+			close(parent_to_child[1]);
+			close(child_to_parent[0]);
+			return 1;
+		}
+		
+		std::cout<< "parent read:" << buffer <<std::endl;
+		close(parent_to_child[1]);
+		close(child_to_parent[0]);
+		
+		//回收子进程
+		wait(nullptr);
+		std::cout<< "parent process done"<<std::endl;
+	}
+	
+	return 0;
+}
 ```
 
 功能：
@@ -423,11 +569,94 @@ int open(const char* pathname, int flags);
 
 ## 3.7 FIFO 示例
 
-文件：
-
-```text
-IPC/FIFO/fifo_reader.cpp
 IPC/FIFO/fifo_writer.cpp
+
+```cpp
+#include <unistd.h>
+#include <fcntl.h>
+#include <iostream>
+#include <cstring>
+
+int main () {
+	const char* fifo_path = "/tmp/cpp_ipc_fifo";
+	
+	std::cout << "Writer opening FIFO..." << std::endl;
+	
+	int fd = open(fifo_path, O_WRONLY);
+	if (fd == -1) {
+		perror("open writer");
+		return 1;
+	}
+	
+	std::cout << "Writer opened FIFO" << std::endl;
+	
+	const char* msg = "hello from fifo writer";
+	
+	ssize_t written = write(fd, msg, strlen(msg));
+	if(written == -1) {
+		perror("write");
+		close(fd);
+		return 1;
+	}
+	
+	std::cout << "Writer send:" << msg <<std::endl;
+	close(fd);
+	return 0;
+}
+```
+
+IPC/FIFO/fifo_reader.cpp
+
+```cpp
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <iostream>
+#include <cstring>
+#include <cerrno>
+
+int main() {
+	const char* fifo_path = "/tmp/cpp_ipc_fifo";
+	
+	//创建命名管道
+	if (mkfifo(fifo_path, 0666) == -1) {
+		if(errno != EEXIST) {
+			perror("mkfifo");
+			return 1;
+		}
+	}
+	
+	std::cout << "Reader waiting for writer..." << std::endl;
+	
+	int fd = open(fifo_path,O_RDONLY);
+	if (fd == -1) {
+		perror("open reader");
+		return 1;
+	}
+	
+	std::cout << "Reader opened FIFO" << std::endl;
+	
+	char buffer[128] = {0};
+	
+	ssize_t n = read(fd, buffer, sizeof(buffer) - 1);
+	if (n == -1) {
+		perror("read");
+		close(fd);
+		return 1;
+	}
+	
+	if (n > 0) {
+		buffer[n] = '\0';
+		std::cout << "Reader received:" << buffer << std::endl;
+	} else {
+		std::cout << "Writer closed without data" << std::endl;
+	}
+	
+	close(fd);
+	unlink(fifo_path);
+	
+	return 0;
+}
 ```
 
 功能：
@@ -579,10 +808,65 @@ pid_t getpid(void);
 
 ## 4.6 Signal 示例
 
-文件：
-
-```text
 IPC/Signal/signal_01_basic.cpp
+
+```cpp
+#include <unistd.h>
+#include <signal.h>
+#include <iostream>
+#include <atomic>
+
+std::atomic<bool> running(true);
+std::atomic<bool> reload_requested(false);
+
+void handle_signal(int signum) {
+	if (signum == SIGUSR1) {
+		reload_requested.store(true);
+	} else if (signum == SIGINT ||signum == SIGTERM) {
+		running.store(false);
+	}
+}
+
+int main() {
+	struct sigaction sa;
+	//表示使用普通处理函数
+	sa.sa_handler = handle_signal;
+	//表示处理当前信号时，不额外阻塞其他信号
+	sigemptyset(&sa.sa_mask);
+	//先使用默认行为。
+	sa.sa_flags = 0;
+
+	if (sigaction(SIGUSR1, &sa, nullptr) == -1) {
+		perror("sigaction SIGUSR1");
+		return 1;
+	}
+
+	if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+		perror("sigaction SIGTERM");
+		return 1;
+	}
+
+	if (sigaction(SIGINT, &sa, nullptr) == -1) {
+		perror("sigaction SIGINT");
+		return 1;
+	}
+
+	std::cout << "Process pid: " << getpid() << std::endl;
+	std::cout << "Send SIGUSR1 to reload, SIGTERM/SIGINT to exit." << std::endl;
+
+	while (running.load()) {
+		if (reload_requested.exchange(false)) {
+			std::cout<< "Reload requested" << std::endl;
+		}
+
+		sleep(1);
+		std::cout << "Working..." <<std::endl;
+	}
+	std::cout << "Graceful exit" << std::endl;
+
+	
+	return 0;
+}
 ```
 
 功能：
@@ -800,11 +1084,135 @@ int close(int fd);
 
 ## 5.7 Unix Socket 示例
 
-文件：
-
-```text
 IPC/UnixSocket/unix_server.cpp
+
+```cpp
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    const char* socket_path = "/tmp/cpp_ipc_socket";
+
+    int server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (server_fd == -1) {
+        perror("socket");
+        return 1;
+    }
+
+    unlink(socket_path); 
+
+    sockaddr_un addr{};
+    addr.sun_family = AF_UNIX;
+    std::strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
+
+    if (bind(server_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) { ???
+        perror("bind");
+        close(server_fd);
+        return 1;
+    }
+
+    if (listen(server_fd, 5) == -1) {
+        perror("listen");
+        close(server_fd);
+        unlink(socket_path);
+        return 1;
+    }
+
+    std::cout << "Unix socket server listening: " << socket_path << std::endl;
+
+    int client_fd = accept(server_fd, nullptr, nullptr);
+    if (client_fd == -1) {
+        perror("accept");
+        close(server_fd);
+        unlink(socket_path);
+        return 1;
+    }
+
+    char buffer[128] = {0};
+
+    ssize_t n = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (n == -1) {                                                                                                                                                                        
+        perror("recv");                                                                                                                                                                     
+        close(client_fd);
+        close(server_fd);
+        unlink(socket_path);                                                                                                                                                          
+        return 1;                                                                                                                                                                           
+    }
+
+    if (n > 0) {
+        buffer[n] = '\0';
+        std::cout << "Server received:" << buffer <<std::endl;
+
+        ssize_t sent = send(client_fd, buffer, n, 0);
+        if (sent == -1) {
+            perror("send");
+        }
+    }
+
+    close(client_fd);
+    close(server_fd);
+    unlink(socket_path);  
+    return 0;
+}
+```
+
 IPC/UnixSocket/unix_client.cpp
+
+```cpp
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    const char* socket_path = "/tmp/cpp_ipc_socket";
+
+    int client_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (client_fd == -1) {
+        perror("socket");
+        return 1;
+    }
+
+    sockaddr_un addr{};
+    addr.sun_family = AF_UNIX;
+    std::strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
+
+    if (connect(client_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {//客户端无需获取服务端的fd?
+        perror("connect");
+        close(client_fd);
+        return 1;
+    }
+
+    const char* msg = "hello from unix client";
+
+    ssize_t sent = send(client_fd, msg, strlen(msg), 0);
+    if (sent == -1) {
+        perror("send");
+        close(client_fd);
+        return 1;
+    }
+
+    char buffer[128] = {0};
+    ssize_t n = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (n == -1) {
+        perror("recv");
+        close(client_fd);
+        return 1;
+    }
+
+    if (n > 0) {
+        buffer[n] = '\0';
+        std::cout << "Client received: " << buffer << std::endl;
+    }
+
+    close(client_fd);
+
+    return 0;
+}
 ```
 
 功能：
@@ -938,11 +1346,131 @@ accept() 前必须 listen()
 
 ## 6.5 TCP 示例
 
-文件：
-
-```text
 IPC/TCP/tcp_server.cpp
+
+```c++
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    //创建套接字
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == -1) {
+        perror("socket");
+        return 1;
+    }
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(5555);
+
+    if (bind(server_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
+        perror("bind");
+        close(server_fd);
+        return 1;
+    }
+
+    if (listen(server_fd, 5) == -1) {
+        perror("listen");
+        close(server_fd);
+        return 1;
+    }
+
+    std::cout << "TCP server listening on port 5555" << std::endl;
+
+    int client_fd = accept(server_fd, nullptr, nullptr);
+    if (client_fd == -1) {
+        perror("accept");
+        close(server_fd);
+        return 1;
+    }
+
+    char buffer[128] = {0};
+    ssize_t n = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (n == -1) {
+        perror("recv");
+        close(client_fd);
+        close(server_fd);
+        return 1;
+    }
+
+    if (n > 0){
+        buffer[n] = '\0';
+        std::cout << "Server received:" << buffer << std::endl;
+
+        ssize_t sent = send(client_fd, buffer, n , 0);
+        if(sent == -1){
+            perror("send");
+        }
+    }
+
+    close(client_fd);
+    close(server_fd);
+    return 0;
+}
+```
+
 IPC/TCP/tcp_client.cpp
+
+```c++
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    //创建套接字
+    int client_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_fd == -1) {
+        perror("socket");
+        return 1;
+    }
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(5555);
+
+    if (inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr) != 1) { //??? 该函数的作用是 ???
+        std::cerr << "inet_pton failed" << std::endl;
+        close(client_fd);
+        return 1;
+    }
+
+    if (connect(client_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
+        perror("connect");
+        close(client_fd);
+        return 1;
+    }
+
+    const char* msg = "hello from tcp client";
+    ssize_t sent = send(client_fd, msg, strlen(msg), 0);
+    if (sent == -1) {
+        perror("send");
+        close(client_fd);
+        return 1;
+    }
+
+    char buffer[128] = {0};
+    ssize_t n = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    if (n == -1) {
+        perror("recv");
+        close(client_fd);
+        return 1;
+    }
+
+    if (n > 0) {
+        buffer[n] = '\0';
+        std::cout << "Client received: " << buffer <<std::endl;
+    }
+
+    close(client_fd);
+    return 0;
+}
 ```
 
 功能：
@@ -1291,10 +1819,79 @@ munmap 取消映射
 close 关闭 fd
 ```
 
-示例文件：
-
-```text
 IPC/MMap/mmap_write.cpp
+
+```c++
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    // 要映射的文件路径。
+    // mmap 的文件映射模式下，文件内容会被映射到进程地址空间里。
+    const char* file_path = "/tmp/mmap_demo.txt";
+
+    // 要写入文件的字符串。
+    const char* msg = "hello mmap";
+
+    // 打开文件。
+    // O_RDWR：可读可写
+    // O_CREAT：文件不存在时创建
+    // 0666：文件权限
+    int fd = open(file_path, O_RDWR | O_CREAT, 0666);
+    if (fd == -1) {
+        perror("open");
+        return 1;
+    }
+
+    // mmap 需要映射一块足够大的文件区域。
+    // 这里先把文件扩展到 4096 字节。
+    // 这样后面写入时不会因为文件太小而出问题。
+    size_t len = 4096;
+    if (ftruncate(fd, len) == -1) {
+        perror("ftruncate");
+        close(fd);
+        return 1;
+    }
+
+    // 创建内存映射。
+    // nullptr：让内核自己选择映射地址。
+    // len：映射长度。
+    // PROT_READ | PROT_WRITE：映射区可读可写。
+    // MAP_SHARED：共享映射，修改会反映到底层文件。
+    // fd：文件描述符。
+    // 0：从文件开头开始映射。
+    void* addr = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    // 把字符串写入映射区。
+    // 这里不是 write 系统调用，而是直接写内存。
+    // 你可以把 addr 理解成一块普通内存地址。
+    std::memcpy(addr, msg, std::strlen(msg));
+
+    // 将内存中的修改同步回文件。
+    // MS_SYNC 表示同步等待写回完成。
+    if (msync(addr, len, MS_SYNC) == -1) {
+        perror("msync");
+    }
+
+    // 取消映射，释放虚拟地址空间里的这块映射关系。
+    munmap(addr, len);
+
+    // 关闭文件描述符。
+    close(fd);
+
+    std::cout << "write done" << std::endl;
+    return 0;
+}
+
 ```
 
 核心理解：
@@ -1316,10 +1913,63 @@ munmap 取消映射
 close 关闭 fd
 ```
 
-示例文件：
-
-```text
 IPC/MMap/mmap_read.cpp
+
+```c++
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <iostream>
+
+int main() {
+    // 要读取的同一个文件。
+    // 这个文件必须先被 mmap_write.cpp 写过。
+    const char* file_path = "/tmp/mmap_demo.txt";
+
+    // 只读打开文件。
+    int fd = open(file_path, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        return 1;
+    }
+
+    // 先获取文件大小。
+    // 因为 mmap 必须知道映射长度。
+    struct stat st{};
+    if (fstat(fd, &st) == -1) {
+        perror("fstat");
+        close(fd);
+        return 1;
+    }
+
+    // 文件实际大小。
+    // 这里是为了让映射长度和文件大小一致。
+    size_t len = st.st_size;
+
+    // 只读映射。
+    // PROT_READ：允许读取。
+    // MAP_SHARED：共享映射。
+    // 这里虽然是读，但仍然使用共享映射最直观。
+    void* addr = mmap(nullptr, len, PROT_READ, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    // 映射后，addr 就像一段内存。
+    // 这里文件里写的是字符串，所以可以直接按 char* 打印。
+    std::cout << "file content: " << static_cast<char*>(addr) << std::endl;
+
+    // 取消映射。
+    munmap(addr, len);
+
+    // 关闭文件描述符。
+    close(fd);
+    return 0;
+}
+
 ```
 
 核心理解：
@@ -1434,16 +2084,55 @@ atomic
 | 适合场景 | 普通文件 I/O | 大文件、随机访问、共享内存 |
 | 是否有映射关系 | 否 | 是 |
 
----
-
-## 8.10 mmap 当前已完成 demo
-
-文件：
-
-```text
-IPC/MMap/mmap_write.cpp
-IPC/MMap/mmap_read.cpp
 IPC/MMap/mmap_anonymous.cpp
+
+```cpp
+#include <sys/mman.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <iostream>
+
+int main() {
+    size_t len = sizeof(int);
+
+    void* addr = mmap(
+        nullptr,
+        len,
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS,
+        -1,
+        0);
+    
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        return 1;
+    }
+
+    int* shared_value = static_cast<int*>(addr);
+    *shared_value = 100;
+
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        return 1;
+    }
+
+    if (pid == 0) {
+        std::cout << "Child sees value: " << *shared_value << std::endl;
+        
+        *shared_value = 200;
+        std::cout << "Child changed value to: " << *shared_value << std::endl;
+        munmap(addr, len);
+        return 0;
+    }
+
+    wait(nullptr);
+    
+    std::cout << "Parent sees value after child exit: " << *shared_value << std::endl;
+    munmap(addr, len);
+
+    return 0;
+}
 ```
 
 运行顺序：
@@ -1654,11 +2343,82 @@ int shm_unlink(const char* name);
 
 ## 9.6 当前 demo
 
-文件：
-
-```text
 IPC/SharedMemory/shm_writer.cpp
+
+```c++
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    const char* shm_name = "/cpp_ipc_shm";
+    const size_t len = 4096;
+
+    int fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+    if (fd == -1) {
+        perror("shm_open");
+        return 1;
+    }
+
+    if (ftruncate(fd, len) == -1) {
+        perror("ftruncate");
+        close(fd);
+        return 1;
+    }
+
+    void* addr = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    const char* msg = "hello from posix shared memory";
+    std::memcpy(addr, msg, std::strlen(msg) + 1);
+
+    std::cout << "Writer wrote: " << msg << std::endl;
+
+    munmap(addr, len);
+    close(fd);
+    return 0;
+}
+```
+
 IPC/SharedMemory/shm_reader.cpp
+
+```c++
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <iostream>
+
+int main() {
+    const char* shm_name = "/cpp_ipc_shm";
+    const size_t len = 4096;
+
+    int fd = shm_open(shm_name, O_RDONLY, 0666);
+    if (fd == -1) {
+        perror("shm_open");
+        return 1;
+    }
+
+    void* addr = mmap(nullptr, len, PROT_READ, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    std::cout << "Reader read: " << static_cast<char*>(addr) << std::endl;
+
+    munmap(addr, len);
+    close(fd);
+
+    shm_unlink(shm_name);
+    return 0;
+}
 ```
 
 运行顺序：
@@ -1897,11 +2657,118 @@ shm_unlink
 
 ## 10.7 当前 demo
 
-文件：
-
-```text
 IPC/Semaphore/shm_sem_writer.cpp
+
+```c++
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <semaphore.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    const char* shm_name = "/cpp_ipc_shm_sem";
+    const char* sem_name = "/cpp_ipc_sem";
+    const size_t len = 4096;
+
+    int fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+    if (fd == -1) {
+        perror("shm_open");
+        return 1;
+    }
+
+    if (ftruncate(fd, len) == -1) {
+        perror("ftruncate");
+        close(fd);
+        return 1;
+    }
+
+    void* addr = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    sem_t* sem = sem_open(sem_name, O_CREAT, 0666, 0);
+    if (sem == SEM_FAILED) {
+        perror("sem_open");
+        munmap(addr, len);
+        close(fd);
+        return 1;
+    }
+
+    const char* msg = "hello with semaphore";
+    std::memcpy(addr, msg, std::strlen(msg) + 1);
+
+    std::cout << "Writer wrote: " << msg << std::endl;
+    sem_post(sem);
+
+    sem_close(sem);
+    munmap(addr, len);
+    close(fd);
+
+    return 0;
+}
+```
+
 IPC/Semaphore/shm_sem_reader.cpp
+
+```c++
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <semaphore.h>
+#include <unistd.h>
+#include <iostream>
+
+int main() {
+    const char* shm_name = "/cpp_ipc_shm_sem";
+    const char* sem_name = "/cpp_ipc_sem";
+    const size_t len = 4096;
+
+    int fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+    if (fd == -1) {
+        perror("shm_open");
+        return 1;
+    }
+
+    if (ftruncate(fd, len) == -1) { //??? 为什么此处 reader也要执行ftruncate ???
+        perror("ftruncate");
+        close(fd);
+        return 1;
+    }
+    
+    void* addr = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    sem_t* sem = sem_open(sem_name, O_CREAT, 0666, 0);
+    if (sem == SEM_FAILED) {
+        perror("sem_open");
+        munmap(addr, len);
+        close(fd);
+        return 1;
+    }
+
+    std::cout << "Reader waiting..." << std::endl;
+
+    sem_wait(sem);
+
+    std::cout << "Reader read: " << static_cast<char*>(addr) << std::endl;
+
+    sem_close(sem);
+    sem_unlink(sem_name);
+
+    munmap(addr, len);
+    close(fd);
+    shm_unlink(shm_name);
+
+    return 0;
+}
 ```
 
 运行顺序：
@@ -2201,11 +3068,215 @@ while (!data->ready) {
 
 ## 11.8 当前 demo
 
-文件：
-
-```text
 IPC/MutexCond/ipc_mutex_producer.cpp
+
+```c++
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <iostream>
+#include <cstring>
+
+// 共享内存中的数据结构。
+// mutex：保护共享数据，防止多个进程同时读写。
+// cond：条件变量，用于通知 consumer 数据已准备好。
+// initialized：标记这块共享内存里的同步原语是否已经初始化过。
+// ready：表示 message 是否已经写好。
+// message：真正要共享的数据。
+struct SharedData {
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    bool initialized;
+    bool ready;
+    char message[256];
+};
+
+int main() {
+    // 共享内存对象名字，多个进程必须使用同一个名字才能共享同一块内存。
+    const char* shm_name = "/cpp_ipc_mutex_cond";
+
+    // 共享内存区域大小。
+    const size_t len = sizeof(SharedData);
+
+    // 创建或打开共享内存对象。
+    // O_CREAT：不存在就创建
+    // O_RDWR：可读可写
+    int fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+    if (fd == -1) {
+        perror("shm_open");
+        return 1;
+    }
+
+    // 共享内存对象刚创建时大小通常是 0。
+    // 必须先扩展到足够大，后面 mmap 才能安全映射这块区域。
+    if (ftruncate(fd, len) == -1) {
+        perror("ftruncate");
+        close(fd);
+        return 1;
+    }
+
+    // 把共享内存对象映射到当前进程地址空间。
+    // 之后可以像操作普通内存一样访问 data。
+    void* addr = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    // 把映射地址转成我们定义的结构体指针。
+    SharedData* data = static_cast<SharedData*>(addr);
+
+    // 第一次创建时初始化 mutex 和 cond。
+    // 这个 demo 允许 producer 或 consumer 任意一方先启动，
+    // 所以两边都有初始化逻辑。
+    if (!data->initialized) {
+        // 初始化跨进程 mutex 属性。
+        pthread_mutexattr_t mutex_attr;
+        pthread_mutexattr_init(&mutex_attr);
+        pthread_mutexattr_setpshared(&mutex_attr, PTHREAD_PROCESS_SHARED);
+        pthread_mutex_init(&data->mutex, &mutex_attr);
+        pthread_mutexattr_destroy(&mutex_attr);
+
+        // 初始化跨进程 condition variable 属性。
+        pthread_condattr_t cond_attr;
+        pthread_condattr_init(&cond_attr);
+        pthread_condattr_setpshared(&cond_attr, PTHREAD_PROCESS_SHARED);
+        pthread_cond_init(&data->cond, &cond_attr);
+        pthread_condattr_destroy(&cond_attr);
+
+        // 初始状态：还没有数据。
+        data->ready = false;
+        data->initialized = true;
+    }
+
+    // 加锁后再写共享数据。
+    // 这样 consumer 在读的时候不会读到一半。
+    pthread_mutex_lock(&data->mutex);
+
+    // 把字符串写进共享内存。
+    // strncpy 是为了避免越界。
+    std::strncpy(data->message, "hello from producer", sizeof(data->message) - 1);
+    data->message[sizeof(data->message) - 1] = '\0';
+
+    // 标记数据已经准备好。
+    data->ready = true;
+
+    std::cout << "Producer wrote: " << data->message << std::endl;
+
+    // 通知一个正在等待的 consumer。
+    // 如果 consumer 正在 pthread_cond_wait，会被唤醒。
+    pthread_cond_signal(&data->cond);
+
+    // 解锁。
+    pthread_mutex_unlock(&data->mutex);
+
+    // 取消映射并关闭 fd。
+    munmap(addr, len);
+    close(fd);
+
+    return 0;
+}
+```
+
 IPC/MutexCond/ipc_mutex_consumer.cpp
+
+```c++
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <iostream>
+
+// 与 producer 使用同一个共享内存结构体定义。
+struct SharedData {
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    bool initialized;
+    bool ready;
+    char message[256];
+};
+
+int main() {
+    // 必须和 producer 使用同一个共享内存名字。
+    const char* shm_name = "/cpp_ipc_mutex_cond";
+    const size_t len = sizeof(SharedData);
+
+    // 打开或创建共享内存对象。
+    // 这个 demo 允许 consumer 先启动，所以也用 O_CREAT。
+    int fd = shm_open(shm_name, O_CREAT | O_RDWR, 0666);
+    if (fd == -1) {
+        perror("shm_open");
+        return 1;
+    }
+
+    // 扩展共享内存对象大小，保证 mmap 后这块区域可用。
+    if (ftruncate(fd, len) == -1) {
+        perror("ftruncate");
+        close(fd);
+        return 1;
+    }
+
+    // 映射共享内存到当前进程地址空间。
+    void* addr = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return 1;
+    }
+
+    SharedData* data = static_cast<SharedData*>(addr);
+
+    // 如果这是第一次初始化，就创建跨进程 mutex/cond。
+    if (!data->initialized) {
+        pthread_mutexattr_t mutex_attr;
+        pthread_mutexattr_init(&mutex_attr);
+        pthread_mutexattr_setpshared(&mutex_attr, PTHREAD_PROCESS_SHARED);
+        pthread_mutex_init(&data->mutex, &mutex_attr);
+        pthread_mutexattr_destroy(&mutex_attr);
+
+        pthread_condattr_t cond_attr;
+        pthread_condattr_init(&cond_attr);
+        pthread_condattr_setpshared(&cond_attr, PTHREAD_PROCESS_SHARED);
+        pthread_cond_init(&data->cond, &cond_attr);
+        pthread_condattr_destroy(&cond_attr);
+
+        data->ready = false;
+        data->initialized = true;
+    }
+
+    // 先加锁，再检查条件。
+    pthread_mutex_lock(&data->mutex);
+
+    std::cout << "Consumer waiting..." << std::endl;
+
+    // 必须用 while，而不是 if。
+    // 原因：可能虚假唤醒，也可能被唤醒后条件又被别的进程改掉。
+    while (!data->ready) {
+        // pthread_cond_wait 会：
+        // 1. 原子地释放 mutex
+        // 2. 阻塞等待 cond
+        // 3. 被唤醒后重新加锁 mutex
+        pthread_cond_wait(&data->cond, &data->mutex);
+    }
+
+    // 走到这里说明数据已经准备好了。
+    std::cout << "Consumer read: " << data->message << std::endl;
+
+    // 这里把 ready 复位，表示这条消息已经消费过了。
+    data->ready = false;
+
+    // 解锁。
+    pthread_mutex_unlock(&data->mutex);
+
+    // 清理资源。
+    munmap(addr, len);
+    close(fd);
+    shm_unlink(shm_name);
+
+    return 0;
+}
 ```
 
 运行顺序：
@@ -2386,11 +3457,110 @@ mq_curmsgs : 当前消息条数
 
 ## 12.5 当前 demo
 
-文件：
-
-```text
 IPC/MessageQueue/mq_sender.cpp
+
+```c++
+#include <mqueue.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    // 消息队列名字，必须以 / 开头。
+    const char* mq_name = "/cpp_ipc_mq_v2";
+
+    // 显式设置消息队列属性。
+    // mq_flags   : 标志位，这里先为 0。
+    // mq_maxmsg  : 队列里最多可以存多少条消息。
+    // mq_msgsize : 单条消息最大长度。
+    // mq_curmsgs : 当前队列里已有多少条消息，通常由内核维护。
+    struct mq_attr attr{};
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 10;
+    attr.mq_msgsize = 256;
+    attr.mq_curmsgs = 0;
+
+    // 打开或创建消息队列。
+    // O_CREAT : 如果不存在就创建。
+    // O_WRONLY : 只写打开。
+    // 0666     : 权限。
+    // &attr    : 显式指定队列属性。
+    mqd_t mq = mq_open(mq_name, O_CREAT | O_WRONLY, 0666, &attr);
+    if (mq == (mqd_t)-1) {
+        perror("mq_open");
+        return 1;
+    }
+
+    const char* msg = "hello from mq sender";
+
+    // mq_send 的第三个参数是“消息长度”。
+    // 这里把字符串结尾的 '\0' 也一起发出去，接收端就能直接当 C 字符串打印。
+    if (mq_send(mq, msg, std::strlen(msg) + 1, 0) == -1) {
+        perror("mq_send");
+        mq_close(mq);
+        return 1;
+    }
+
+    std::cout << "Sender sent: " << msg << std::endl;
+
+    mq_close(mq);
+    return 0;
+}
+
+```
+
 IPC/MessageQueue/mq_receiver.cpp
+
+```c++
+#include <mqueue.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <iostream>
+#include <cstring>
+
+int main() {
+    const char* mq_name = "/cpp_ipc_mq_v2";
+
+    // 打开消息队列时也可以给出属性。
+    // 如果队列已经存在，这里的 attr 不会修改已有队列属性，
+    // 主要还是用于创建时指定参数。
+    struct mq_attr attr{};
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 10;
+    attr.mq_msgsize = 256;
+    attr.mq_curmsgs = 0;
+
+    // 只读打开消息队列。
+    mqd_t mq = mq_open(mq_name, O_CREAT | O_RDONLY, 0666, &attr);
+    if (mq == (mqd_t)-1) {
+        perror("mq_open");
+        return 1;
+    }
+
+    // 接收缓冲区必须 >= mq_msgsize。
+    // 这里我们显式设置为 256，和创建队列时的 mq_msgsize 保持一致。
+    char buffer[256] = {0};
+
+    // prio 是消息优先级输出参数。
+    // mq_receive 收到消息后，会把这条消息的优先级写到这里。
+    unsigned int prio = 0;
+
+    ssize_t n = mq_receive(mq, buffer, sizeof(buffer), &prio);
+    if (n == -1) {
+        perror("mq_receive");
+        mq_close(mq);
+        return 1;
+    }
+
+    std::cout << "Receiver got: " << buffer << std::endl;
+    std::cout << "Priority: " << prio << std::endl;
+
+    mq_close(mq);
+    mq_unlink(mq_name);
+    return 0;
+}
+
 ```
 
 运行顺序：
@@ -2932,10 +4102,173 @@ event.events = EPOLLIN | EPOLLET;
 
 ## 13.12 当前 demo
 
-文件：
-
-```text
 IPC/EPOLL/epoll_tcp_server.cpp
+
+```c++
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <iostream>
+#include <cstring>
+#include <cerrno>
+
+// 把 fd 设置成非阻塞模式。
+// epoll 服务器不能让某个 accept/recv 卡住整个事件循环。
+int set_nonblocking(int fd) {
+    // 先取出 fd 原来的状态标志。
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1) {
+        return -1;
+    }
+
+    // 在原有标志基础上加 O_NONBLOCK，不能直接覆盖原 flags。
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+}
+
+int main() {
+    // 创建 TCP socket。
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == -1) {
+        perror("socket");
+        return 1;
+    }
+
+    // 允许端口快速复用，避免程序重启后 bind 报 Address already in use。
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+        perror("setsockopt");
+        close(server_fd);
+        return 1;
+    }
+
+    // 绑定 0.0.0.0:5555，表示监听本机所有网卡的 5555 端口。
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(5555);
+
+    if (bind(server_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
+        perror("bind");
+        close(server_fd);
+        return 1;
+    }
+
+    // 把 socket 从普通 socket 变成监听 socket。
+    // backlog=128 表示内核连接队列长度提示。
+    if (listen(server_fd, 128) == -1) {
+        perror("listen");
+        close(server_fd);
+        return 1;
+    }
+
+    if (set_nonblocking(server_fd) == -1) {
+        perror("set_nonblocking server_fd");
+        close(server_fd);
+        return 1;
+    }
+
+    // 创建 epoll 实例，后续用它统一管理 server_fd 和 client_fd。
+    int epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1) {
+        perror("epoll_create1");
+        close(server_fd);
+        return 1;
+    }
+
+    // 监听 server_fd 的可读事件。
+    // 对监听 socket 来说，EPOLLIN 表示有新连接可以 accept。
+    epoll_event event{};
+    event.events = EPOLLIN;
+    event.data.fd = server_fd;
+
+    // 把 server_fd 注册到 epoll 中。
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &event) == -1) {
+        perror("epoll_ctl server_fd");
+        close(server_fd);
+        close(epoll_fd);
+        return 1;
+    }
+
+    std::cout << "epoll TCP server listening on port 5555" << std::endl;
+
+    const int MAX_EVENTS = 64;
+    epoll_event events[MAX_EVENTS];
+
+    while(true) {
+        // 阻塞等待事件发生。
+        // 返回值 n 表示本次有多少个 fd 就绪。
+        int n = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+        if (n == -1) {
+            perror("epoll_wait");
+            break;
+        }
+
+        for(int i = 0; i < n; i ++) {
+            int fd = events[i].data.fd;
+
+            if (fd == server_fd) {
+                // server_fd 可读：说明有新连接到达。
+                // 用 while 一次性 accept 完当前连接队列，直到 EAGAIN 表示没有更多连接。
+                while (true) {
+                    int client_fd = accept(server_fd, nullptr, nullptr);
+                    if (client_fd == -1) {
+                        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                            break;
+                        }
+
+                        perror("accept");
+                        break;
+                    }
+
+                    if (set_nonblocking(client_fd) == -1) {
+                        perror("set_nonblocking client_fd");
+                        close(client_fd);
+                        continue;
+                    }
+
+                    // 监听 client_fd 的可读事件。
+                    // 对客户端 socket 来说，EPOLLIN 表示有数据可以 recv。
+                    epoll_event client_event{};
+                    client_event.events = EPOLLIN;
+                    client_event.data.fd = client_fd;
+                    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &client_event) == -1) {
+                        perror("epoll_ctl client_fd");
+                        close(client_fd);
+                    } else {
+                        std::cout << "New client: " << client_fd << std::endl;
+                    }
+                }
+            } else {
+                // client_fd 可读：说明客户端发来了数据，或者客户端关闭了连接。
+                char buffer[1024] = {0};
+                ssize_t count = recv(fd, buffer, sizeof(buffer), 0);
+                if (count == 0) {
+                    std::cout << "Client closed: " << fd << std::endl;
+                    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, nullptr);
+                    close(fd);
+                } else if (count == -1) {
+                    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                        continue;
+                    }
+
+                    perror("recv");
+                    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, nullptr);
+                    close(fd);
+                } else {
+                    std::cout << "Received from " << fd << ": " << buffer << std::endl;
+                    send(fd, buffer, count, 0);
+                }
+            }
+        }
+    }
+
+
+    close(server_fd);
+    close(epoll_fd);
+    return 0;
+}
 ```
 
 功能：
@@ -3016,9 +4349,9 @@ epoll：事件注册在内核，返回的是就绪事件，更适合大量连接
 
 ---
 
-# 14. 当前阶段总结
+# 14. 总结
 
-## 已掌握的 IPC 主线
+## IPC 主线
 
 ```text
 Pipe -> FIFO -> Signal -> Unix Socket -> TCP Socket -> mmap 文件映射 -> 匿名 mmap -> POSIX Shared Memory -> Semaphore -> Mutex/Condition Variable -> Message Queue -> select/poll/epoll
