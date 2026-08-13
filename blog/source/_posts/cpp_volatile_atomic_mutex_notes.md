@@ -1,4 +1,12 @@
-# C++ volatile、atomic、原子性和锁学习笔记
+---
+title: C++原子性
+date: 2026-08-10
+tags:
+  - C++
+categories: Docs
+---
+
+# C++ volatile、atomic、原子性和锁
 
 ## 1. 学习目标
 
