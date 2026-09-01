@@ -9,10 +9,6 @@ cover: /img/img1.png
 
 # IPC-进程间通信
 
-> 当前已学：Pipe、双向 Pipe、FIFO、Signal、Unix Domain Socket、TCP Socket。
-
----
-
 # 1. IPC 总览
 
 IPC（Inter-Process Communication）是进程间通信机制，用来解决：

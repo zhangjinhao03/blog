@@ -1,10 +1,10 @@
 ---
 title: Linux 进程、内存、CPU
 date: 2026-08-10
-tags: Linux
+tags: [Linux]
 categories: Docs
-top_img: 
-cover: 
+top_img: /img/830179.jpg
+cover: /img/830179.jpg
 ---
 
 # Linux 进程、内存、CPU 检查学习笔记

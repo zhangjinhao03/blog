@@ -5,6 +5,8 @@ tags:
   - Butterfly
   - Hexo
 categories: Docs
+top_img: /img/830179.jpg
+cover: /img/830179.jpg
 ---
 
 # Butterfly 常用标签语法
@@ -16,6 +18,8 @@ categories: Docs
 ```md
 {% label 例子 purple %}
 ```
+
+{% label 例子 purple %}
 
 可用颜色：
 
@@ -34,6 +38,10 @@ categories: Docs
 {% label 警告 red %}
 ```
 
+{% label 例子 purple %}
+{% label 提示 blue %}
+{% label 警告 red %}
+
 ## 2. Note 提示块
 
 用于展示提示、警告、信息块。
@@ -46,6 +54,10 @@ categories: Docs
 {% endnote %}
 ```
 
+{% note info %}
+这里是提示内容
+{% endnote %}
+
 ### 完整写法
 
 ```md
@@ -53,6 +65,10 @@ categories: Docs
 Any content (support inline tags too.)
 {% endnote %}
 ```
+
+{% note [color] [icon] [style] %}
+Any content (support inline tags too.)
+{% endnote %}
 
 ### 常见类型
 
@@ -71,20 +87,29 @@ Any content (support inline tags too.)
 {% endnote %}
 ```
 
+{% note warning %}
+这里是警告内容
+{% endnote %}
+
 ## 3. 按钮
 
 用于生成可点击按钮。
 
 ```md
-{% btn https://github.com github %}
+{% btn https://github.com,github %}
 ```
+
+{% btn https://github.com,github %}
 
 示例：
 
 ```md
-{% btn https://github.com github %}
-{% btn https://butterfly.js.org Butterfly %}
+{% btn https://github.com,github %}
+{% btn https://butterfly.js.org,Butterfly %}
 ```
+
+{% btn https://github.com,github %}
+{% btn https://butterfly.js.org,Butterfly %}
 
 ## 4. Tab 标签页
 
@@ -102,6 +127,16 @@ Any content (support inline tags too.)
 {% endtabs %}
 ```
 
+{% tabs 示例 %}
+<!-- tab 第一项 -->
+内容1
+<!-- endtab -->
+
+<!-- tab 第二项 -->
+内容2
+<!-- endtab -->
+{% endtabs %}
+
 ## 5. 折叠块
 
 用于隐藏和展开内容。
@@ -112,6 +147,10 @@ Any content (support inline tags too.)
 {% endhideToggle %}
 ```
 
+{% hideToggle 点击展开 %}
+这里是折叠内容
+{% endhideToggle %}
+
 ## 6. 引用块
 
 普通 Markdown 也可以直接写：
@@ -119,6 +158,8 @@ Any content (support inline tags too.)
 ```md
 > 这是一段引用内容
 ```
+
+> 这是一段引用内容
 
 ## 7. 文章中的图片
 
@@ -193,10 +234,6 @@ toc:
 - `fab` 表示品牌图标
 - 图标名要写完整，比如 `fas fa-book`
 
-https://butterfly.js.org/posts/ceeb73f/
-
-
-
 {% note purple 'fas fa-lightbulb' flat %}
 灯泡
 {% endnote %}
@@ -213,3 +250,6 @@ https://butterfly.js.org/posts/ceeb73f/
   这里是铃铛2
   {% endnote %}
 
+参考文档：
+
+https://butterfly.js.org/posts/ceeb73f/

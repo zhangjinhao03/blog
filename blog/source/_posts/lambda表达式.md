@@ -1,7 +1,7 @@
 ---
 title: lambda表达式
 date: 2026-08-06 18:43:05
-tags: C++
+tags: [C++,C++11]
 categories: Docs
 top_img: /img/img5.png
 cover: /img/img5.png

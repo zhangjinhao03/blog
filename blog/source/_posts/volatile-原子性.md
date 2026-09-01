@@ -4,6 +4,8 @@ date: 2026-08-10
 tags:
   - C++
 categories: Docs
+top_img: /img/830179.jpg
+cover: /img/830179.jpg
 ---
 
 # C++ volatile、atomic、原子性和锁
