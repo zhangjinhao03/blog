@@ -1,14 +1,14 @@
 ---
-title: C++原子性
+title: 【C++】多线程与并发
 date: 2026-08-10
 tags:
-  - C++
-categories: Docs
+  - CPP
+categories: Markdown
 top_img: /img/830179.jpg
 cover: /img/830179.jpg
 ---
 
-# C++ volatile、atomic、原子性和锁
+# 多线程与并发
 
 ## 1. 学习目标
 
@@ -43,8 +43,6 @@ std::condition_variable
 ---
 
 ## 2. 推荐学习顺序
-
-最快掌握路线：
 
 ```text
 1. 先理解什么是数据竞争
@@ -531,7 +529,7 @@ if (!data.empty()) {
 
 ---
 
-## 10. 实验 1：不加锁的 counter++
+## 实验 1：不加锁的 counter++
 
 代码：
 
@@ -587,7 +585,7 @@ counter++ 不是原子操作。
 
 ---
 
-## 11. 实验 2：使用 volatile
+## 实验 2：使用 volatile
 
 代码：
 
@@ -624,7 +622,7 @@ volatile 不能消除数据竞争。
 
 ---
 
-## 12. 实验 3：使用 std::atomic
+## 实验 3：使用 std::atomic
 
 代码：
 
@@ -710,73 +708,7 @@ mutex 保证同一时间只有一个线程执行 counter++。
 
 ---
 
-## 14. 三天学习路线
-
-### 第一天：数据竞争和锁
-
-掌握：
-
-```text
-线程同时读写同一个变量会出问题
-counter++ 不是原子的
-mutex 如何保护临界区
-lock_guard 为什么安全
-```
-
-练习：
-
-```text
-1. 不加锁 counter++，观察结果错误
-2. 用 mutex 修复
-3. 用 atomic 修复
-```
-
----
-
-### 第二天：atomic 和 volatile
-
-掌握：
-
-```text
-volatile 不是线程同步工具
-atomic 能保证原子操作
-load/store/fetch_add
-atomic<bool> 用作简单标志位
-```
-
-练习：
-
-```text
-1. volatile counter++ 仍然错误
-2. atomic counter++ 正确
-3. atomic<bool> 控制线程退出
-```
-
----
-
-### 第三天：锁的工程用法
-
-掌握：
-
-```text
-mutex
-lock_guard
-unique_lock
-condition_variable
-死锁
-锁粒度
-```
-
-练习：
-
-```text
-1. 多线程安全队列
-2. 生产者消费者模型
-```
-
----
-
-## 15. 一句话总结
+## 总结
 
 ```text
 volatile：防止编译器优化某些特殊读写，主要用于硬件寄存器等场景，不解决线程安全。
@@ -785,21 +717,3 @@ mutex：保护一段临界区，同一时间只允许一个线程执行，适合
 原子性：一个操作不可被中断地完整发生。
 ```
 
----
-
-## 16. 掌握标准
-
-能回答以下问题，说明已经入门：
-
-1. `counter++` 为什么不是原子的？
-2. 什么是数据竞争？
-3. C++ 中数据竞争为什么严重？
-4. `volatile` 的作用是什么？
-5. `volatile` 为什么不能保证线程安全？
-6. `std::atomic<int>` 为什么可以解决计数器问题？
-7. `fetch_add()` 是什么？
-8. `std::mutex` 保护的是什么？
-9. `std::lock_guard` 为什么比手写 `lock()` / `unlock()` 更安全？
-10. 什么时候用 atomic？
-11. 什么时候用 mutex？
-12. 为什么 `std::vector` 这类容器一般用 mutex 保护？

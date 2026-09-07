@@ -1,13 +1,13 @@
 ---
-title: 强制类型转换
+title: 【C++】类型转换
 date: 2026-08-06 18:43:05
-tags: C++
-categories: Docs
+tags: CPP
+categories: Markdown
 top_img: /img/img2.jpg
 cover: /img/img2.jpg
 ---
 
-# C++ 的几种强制类型转换
+# 【C++】类型转换
 
 C++ 主要有 4 种显式类型转换：
 

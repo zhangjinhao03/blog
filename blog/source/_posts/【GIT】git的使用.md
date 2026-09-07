@@ -1,17 +1,13 @@
 ---
-title: git help
+title: 【GIT】Git基础
 date: 2024-10-12 16:19:05
-tags: [git]
-categories: Docs
+tags: [Git]
+categories: Markdown
 top_img: /img/img6.jpg
 cover: /img/img6.jpg
 ---
 
-<!-- toc -->
-
-
-
-# Git基础
+# Git Help
 
 > 本文档集合了各种软件管理工具包括repo、git、github、gerrit的基础知识和使用指南，帮助刚入职的软件工程师快速上手这些工具的使用。
 

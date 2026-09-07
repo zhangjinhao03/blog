@@ -1,8 +1,8 @@
 ---
-title: Android系统的耦合与解耦
+title: 【Android】系统的耦合与解耦
 date: 2024-10-15 20:06:44
 tags: Android
-categories: Docs
+categories: Markdown
 top_img: /img/img8.jpg
 cover: /img/img8.jpg
 ---

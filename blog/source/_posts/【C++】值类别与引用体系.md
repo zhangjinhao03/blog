@@ -1,13 +1,13 @@
 ---
-title: 左值 / 右值
+title: 【C++】值类别
 date: 2026-08-06 18:43:05
-tags: C++
-categories: Docs
+tags: CPP
+categories: Markdown
 top_img: /img/img1.png
 cover: /img/img1.png
 ---
 
-# 左值 / 右值
+# 【C++】值类别
 
 > 当前已学：左值、右值、左值引用、const 左值引用、右值引用。
 

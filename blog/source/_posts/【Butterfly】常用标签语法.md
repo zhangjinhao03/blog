@@ -1,10 +1,10 @@
 ---
-title: Butterfly常用标签语法
+title: 【Butterfly】常用标签语法
 date: 2026-08-10 00:00:00
 tags:
   - Butterfly
   - Hexo
-categories: Docs
+categories: Markdown
 top_img: /img/830179.jpg
 cover: /img/830179.jpg
 ---

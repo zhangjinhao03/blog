@@ -1,13 +1,13 @@
 ---
-title: 智能指针
+title: 【C++】资源管理与智能指针
 date: 2026-08-06 18:43:05
-tags: [C++,C++11]
-categories: Docs
+tags: [CPP,CPP11]
+categories: Markdown
 top_img: /img/img3.png
 cover: /img/img3.png
 ---
 
-# Smart Pointer-智能指针
+# 【C++】资源管理与智能指针
 
 > 当前已学：`unique_ptr`、`shared_ptr`、`weak_ptr`
 

@@ -1,8 +1,8 @@
 ---
-title: 毕业设计题目的分配
+title: 【JAVA】毕业设计题目的分配
 date: 2021-10-30
-tags: java
-categories: Docs
+tags: Java
+categories: Markdown
 top_img: /img/img7.jpg
 cover: /img/img7.jpg
 ---

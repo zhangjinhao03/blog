@@ -1,8 +1,8 @@
 ---
-title: lambda表达式
+title: 【C++】lambda表达式
 date: 2026-08-06 18:43:05
-tags: [C++,C++11]
-categories: Docs
+tags: [CPP,CPP11]
+categories: Markdown
 top_img: /img/img5.png
 cover: /img/img5.png
 ---

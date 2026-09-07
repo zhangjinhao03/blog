@@ -1,8 +1,8 @@
 ---
-title: Android中的IPC通信与Binder机制
+title: 【Android】Binder机制
 date: 2026-09-01 14:43:48
 tags: [IPC,Android]
-categories: Docs
+categories: Markdown
 top_img: /img/1400253.png
 cover: /img/1400253.png
 ---

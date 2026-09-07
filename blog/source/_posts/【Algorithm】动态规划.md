@@ -1,7 +1,8 @@
 ---
-title: 动态规划
+title: 【Algorithm】动态规划
 date: 2026-08-21 16:45:00
-tags: [cpp,dp]
+tags: [Algorithm,DP]
+categories: Markdown
 top_img: /img/wujianmiao.jpg
 cover: /img/wujianmiao.jpg
 
