@@ -40,7 +40,7 @@ code_blocks:
   language: true
   # true: shrink the code blocks | false: expand the code blocks | none: expand code blocks and hide the button
   shrink: false
-  fullpage: false
+  fullpage: true
 
 # Social media links
 # Formal:
@@ -364,7 +364,7 @@ rightside_bottom:
 
 # Conversion between Traditional and Simplified Chinese
 translate:
-  enable: false
+  enable: true
   # The text of a button
   default: 繁
   # the language of website (1 - Traditional Chinese/ 2 - Simplified Chinese）
@@ -925,7 +925,7 @@ lightbox:
 
 # Series
 series:
-  enable: false
+  enable: true
   # Order by title or date
   orderBy: 'title'
   # Sort of order. 1, asc for ascending; -1, desc for descending
