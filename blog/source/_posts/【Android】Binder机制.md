@@ -2,7 +2,8 @@
 title: 【Android】Binder机制
 date: 2026-09-01 14:43:48
 tags: [IPC,Android]
-categories: Markdown
+categories: Android
+series: Android虚拟机知识
 top_img: /img/1400253.png
 cover: /img/1400253.png
 ---

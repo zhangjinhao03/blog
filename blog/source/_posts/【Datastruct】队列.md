@@ -1,8 +1,9 @@
 ---
-title: 【数据结构】队列
+title: 【Datastruct】队列
 date: 2022-11-12 15:28:52
 tags: [C,Queue,Datastruct]
-categories: Markdown
+categories: Datastruct
+series: 数据结构基础
 top_img: /img/922387.jpg
 cover: /img/922387.jpg
 ---

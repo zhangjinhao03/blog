@@ -1,8 +1,9 @@
 ---
-title: 【数据结构】栈的实现
+title: 【Datastruct】栈的实现
 date: 2024-02-22 15:28:05
 tags: [C,Stack,Datastruct]
-categories: Markdown
+categories: Datastruct
+series: 数据结构基础
 top_img: /img/922387.jpg
 cover: /img/922387.jpg
 ---

@@ -1,8 +1,9 @@
 ---
-title: 【数据结构】二叉树
+title: 【Datastruct】二叉树
 date: 2022-11-12 15:28:39
 tags: [C,BST,BinaryTree,Datastruct]
-categories: Markdown
+categories: Datastruct
+series: 数据结构基础
 top_img: /img/922387.jpg
 cover: /img/922387.jpg
 ---

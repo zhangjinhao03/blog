@@ -239,16 +239,16 @@ toc:
 {% endnote %}
 
 {% note purple 'fas fa-magic' %}
-  这里是魔法棒提示块
-  {% endnote %}
+这里是魔法棒提示块
+{% endnote %}
 
 {% note purple 'fas fa-wand-magic-sparkles' %}
-  这里是魔法棒提示块2
-  {% endnote %}
+这里是魔法棒提示块2
+{% endnote %}
 
 {% note pink 'fas fa-bell' %}
-  这里是铃铛2
-  {% endnote %}
+这里是铃铛2
+{% endnote %}
 
 参考文档：
 

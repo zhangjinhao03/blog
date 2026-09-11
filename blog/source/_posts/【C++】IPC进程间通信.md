@@ -1,10 +1,10 @@
 ---
 title: 【C++】IPC
 date: 2026-08-04 19:43:05
-tags: [CPP,IPC]
+tags: [CPP,IPC,Linux]
 categories: Markdown
-top_img: /img/1210768.png
-cover: /img/1210768.png
+top_img: /img/ipc.png
+cover: /img/ipc.png
 ---
 
 # 【C++】IPC-进程间通信

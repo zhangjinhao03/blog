@@ -2,7 +2,8 @@
 title: 【C++】资源管理与智能指针
 date: 2026-08-06 18:43:05
 tags: [CPP,CPP11]
-categories: Markdown
+categories: CPP
+series: C++知识整理
 top_img: /img/img3.png
 cover: /img/img3.png
 ---

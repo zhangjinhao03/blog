@@ -2,7 +2,7 @@
 title: 【GIT】Git基础
 date: 2024-10-12 16:19:05
 tags: [Git]
-categories: Markdown
+categories: GIT
 top_img: /img/img6.jpg
 cover: /img/img6.jpg
 ---

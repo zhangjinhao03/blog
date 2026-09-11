@@ -2,7 +2,7 @@
 title: 【Linux】 进程、内存、CPU
 date: 2026-08-10
 tags: [Linux]
-categories: Markdown
+categories: Linux
 top_img: /img/830179.jpg
 cover: /img/830179.jpg
 ---

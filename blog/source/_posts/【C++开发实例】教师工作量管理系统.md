@@ -2,7 +2,8 @@
 title: 【C++开发实例】教师工作量管理系统
 date: 2022-11-16 19:50:22
 tags: [CPP,List]
-categories: Markdown
+categories: CPP
+series: C++开发实例
 top_img: /img/img9.jpg
 cover: /img/img9.jpg
 ---

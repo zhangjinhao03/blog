@@ -26,3 +26,350 @@
   color: var(--theme-color) !important;
   transform: scale(1.08);
 }
+
+.questionnaire-page [hidden] {
+  display: none !important;
+}
+
+.questionnaire-page {
+  --questionnaire-accent: var(--theme-color, #49a9ee);
+  --questionnaire-ink: var(--font-color, #34495e);
+  --questionnaire-muted: var(--second-text-color, #8b98a8);
+  --questionnaire-card: var(--card-bg, #fff);
+  --questionnaire-border: var(--hr-border, #e8edf2);
+  max-width: 920px;
+  margin: 0 auto;
+  color: var(--questionnaire-ink);
+}
+
+.questionnaire-page * {
+  box-sizing: border-box;
+}
+
+.questionnaire-page .questionnaire-hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 24px;
+  padding: 42px 44px 38px;
+  border: 1px solid rgba(73, 169, 238, 0.16);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(191, 227, 255, 0.48), rgba(255, 255, 255, 0.92));
+}
+
+.questionnaire-page .questionnaire-hero::after {
+  position: absolute;
+  right: -55px;
+  bottom: -80px;
+  width: 230px;
+  height: 230px;
+  border: 30px solid rgba(255, 255, 255, 0.48);
+  border-radius: 50%;
+  content: '';
+}
+
+.questionnaire-page .questionnaire-eyebrow {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 12px;
+  color: var(--questionnaire-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.questionnaire-page h1,
+.questionnaire-page h2,
+.questionnaire-page p {
+  position: relative;
+  z-index: 1;
+}
+
+.questionnaire-page h1 {
+  margin: 0 0 14px;
+  color: var(--questionnaire-ink);
+  font-size: clamp(1.8rem, 4vw, 2.65rem);
+  line-height: 1.25;
+}
+
+.questionnaire-page .questionnaire-intro {
+  max-width: 620px;
+  margin: 0;
+  color: var(--questionnaire-muted);
+  line-height: 1.8;
+}
+
+.questionnaire-page .questionnaire-progress {
+  margin: 0 0 22px;
+  padding: 20px 24px;
+  border: 1px solid var(--questionnaire-border);
+  border-radius: 16px;
+  background: var(--questionnaire-card);
+}
+
+.questionnaire-page .questionnaire-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: var(--questionnaire-muted);
+  font-size: 0.9rem;
+}
+
+.questionnaire-page .questionnaire-progress-heading strong {
+  color: var(--questionnaire-accent);
+  font-size: 1rem;
+}
+
+.questionnaire-page .questionnaire-progress-track {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(73, 169, 238, 0.12);
+}
+
+.questionnaire-page .questionnaire-progress-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8fd3ff, var(--questionnaire-accent));
+  transition: width 0.25s ease;
+}
+
+.questionnaire-page .questionnaire-form {
+  display: grid;
+  gap: 16px;
+}
+
+.questionnaire-page .questionnaire-question {
+  min-width: 0;
+  margin: 0;
+  padding: 24px;
+  border: 1px solid var(--questionnaire-border);
+  border-radius: 16px;
+  background: var(--questionnaire-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.questionnaire-page .questionnaire-question:focus-within {
+  border-color: rgba(73, 169, 238, 0.52);
+  box-shadow: 0 8px 24px rgba(73, 169, 238, 0.08);
+}
+
+.questionnaire-page .questionnaire-question-error {
+  border-color: #f56c6c;
+  box-shadow: 0 8px 24px rgba(245, 108, 108, 0.1);
+}
+
+.questionnaire-page legend {
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 0;
+  color: var(--questionnaire-ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.questionnaire-page .questionnaire-number {
+  display: inline-grid;
+  width: 34px;
+  height: 27px;
+  margin-right: 10px;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(73, 169, 238, 0.12);
+  color: var(--questionnaire-accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  vertical-align: 2px;
+}
+
+.questionnaire-page .questionnaire-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.questionnaire-page .questionnaire-option {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--questionnaire-border);
+  border-radius: 12px;
+  cursor: pointer;
+  line-height: 1.6;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.questionnaire-page .questionnaire-option:hover {
+  border-color: rgba(73, 169, 238, 0.5);
+  background: rgba(73, 169, 238, 0.05);
+  transform: translateY(-1px);
+}
+
+.questionnaire-page .questionnaire-option:has(input:checked) {
+  border-color: var(--questionnaire-accent);
+  background: rgba(73, 169, 238, 0.1);
+}
+
+.questionnaire-page .questionnaire-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.questionnaire-page .questionnaire-option input:focus-visible + .questionnaire-option-marker {
+  outline: 3px solid rgba(73, 169, 238, 0.3);
+  outline-offset: 2px;
+}
+
+.questionnaire-page .questionnaire-option-marker {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(73, 169, 238, 0.35);
+  border-radius: 50%;
+  color: var(--questionnaire-accent);
+  font-size: 0.75rem;
+  line-height: 24px;
+  text-align: center;
+}
+
+.questionnaire-page .questionnaire-option input:checked + .questionnaire-option-marker {
+  border-color: var(--questionnaire-accent);
+  background: var(--questionnaire-accent);
+  color: #fff;
+}
+
+.questionnaire-page .questionnaire-option-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.questionnaire-page .questionnaire-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.questionnaire-page .questionnaire-button {
+  min-width: 130px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.questionnaire-page .questionnaire-button:hover {
+  opacity: 0.86;
+  transform: translateY(-1px);
+}
+
+.questionnaire-page .questionnaire-button:focus-visible {
+  outline: 3px solid rgba(73, 169, 238, 0.35);
+  outline-offset: 3px;
+}
+
+.questionnaire-page .questionnaire-button-primary {
+  background: var(--questionnaire-accent);
+  color: #fff;
+}
+
+.questionnaire-page .questionnaire-button-secondary {
+  background: rgba(73, 169, 238, 0.1);
+  color: var(--questionnaire-accent);
+}
+
+.questionnaire-page .questionnaire-error {
+  margin: 18px 0 0;
+  color: #e45656;
+  font-size: 0.92rem;
+}
+
+.questionnaire-page .questionnaire-result {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 26px;
+  border: 1px solid rgba(73, 169, 238, 0.28);
+  border-radius: 16px;
+  background: rgba(73, 169, 238, 0.07);
+}
+
+.questionnaire-page .questionnaire-result-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--questionnaire-accent);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.questionnaire-page .questionnaire-result h2 {
+  margin: 2px 0 8px;
+  font-size: 1.3rem;
+}
+
+.questionnaire-page .questionnaire-result p {
+  margin: 0 0 14px;
+  color: var(--questionnaire-muted);
+  line-height: 1.7;
+}
+
+.questionnaire-page .questionnaire-summary {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.questionnaire-page .questionnaire-result ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.questionnaire-page .questionnaire-result li {
+  margin: 5px 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .questionnaire-page .questionnaire-hero {
+    padding: 30px 24px;
+    border-radius: 16px;
+  }
+
+  .questionnaire-page .questionnaire-progress,
+  .questionnaire-page .questionnaire-question,
+  .questionnaire-page .questionnaire-result {
+    padding: 18px;
+    border-radius: 13px;
+  }
+
+  .questionnaire-page .questionnaire-options {
+    grid-template-columns: 1fr;
+  }
+
+  .questionnaire-page .questionnaire-button {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .questionnaire-page .questionnaire-progress-track span,
+  .questionnaire-page .questionnaire-question,
+  .questionnaire-page .questionnaire-option,
+  .questionnaire-page .questionnaire-button {
+    transition: none;
+  }
+}

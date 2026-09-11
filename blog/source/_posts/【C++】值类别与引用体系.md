@@ -2,7 +2,8 @@
 title: 【C++】值类别
 date: 2026-08-06 18:43:05
 tags: CPP
-categories: Markdown
+categories: CPP
+series: C++知识整理
 top_img: /img/img1.png
 cover: /img/img1.png
 ---

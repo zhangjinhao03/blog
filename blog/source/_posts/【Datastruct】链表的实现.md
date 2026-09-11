@@ -1,8 +1,9 @@
 ---
-title: 【数据结构】链表的实现
+title: 【Datastruct】链表的实现
 date: 2022-11-14 18:14:32
 tags: [C,List,Datastruct]
-categories: Markdown
+categories: Datastruct
+series: 数据结构基础
 top_img: /img/922387.jpg
 cover: /img/922387.jpg
 ---

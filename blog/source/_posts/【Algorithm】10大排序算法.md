@@ -2,7 +2,8 @@
 title: 【Algorithm】10大排序算法
 date: 2026-09-07 16:06:10
 tags: [Algorithm,Sort]
-categories: Markdown
+categories: Algorithm
+series: 算法基础
 top_img: /img/870135.png
 cover: /img/870135.png
 ---

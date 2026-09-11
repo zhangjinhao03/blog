@@ -1,8 +1,9 @@
 ---
-title: 【数据结构】哈希表拉链法实现
+title: 【Datastruct】哈希表拉链法实现
 date: 2023-09-07 15:29:06
 tags: [C,Hash,Datastruct]
-categories: Markdown
+categories: Datastruct
+series: 数据结构基础
 top_img: /img/922387.jpg
 cover: /img/922387.jpg
 ---
