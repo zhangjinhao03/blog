@@ -5,8 +5,8 @@ tags:
   - CPP
 categories: CPP
 series: C++知识整理
-top_img: /img/830179.jpg
-cover: /img/830179.jpg
+top_img: /img/img11.png
+cover: /img/img11.png
 ---
 
 # 多线程与并发

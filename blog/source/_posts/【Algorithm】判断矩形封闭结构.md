@@ -6,8 +6,8 @@ tags:
   - String
 categories: Algorithm
 series: 每日算法题
-top_img: /img/870135.png
-cover: /img/870135.png
+top_img: /img/img10.png
+cover: /img/img10.png
 ---
 
 {% note purple 'fas fa-wand-magic-sparkles' %}

@@ -4,8 +4,8 @@ date: 2026-09-07 16:06:10
 tags: [Algorithm,Sort]
 categories: Algorithm
 series: 算法基础
-top_img: /img/870135.png
-cover: /img/870135.png
+top_img: /img/sort.png
+cover: /img/sort.png
 ---
 
 # 10大排序算法
@@ -94,13 +94,19 @@ void Sort::swap(int &num1, int &num2){
 ...
 ```
 
-
+---
 
 ## 1.冒泡排序
 
+```tex
 稳定性：稳定
-时间复杂度：O(n^2)
+最好情况：O(n)
+最坏情况：O(n²)
+平均时间复杂度：O(n²)
 空间复杂度：O(1)
+```
+
+代码实现：
 
 ```cpp
 int Sort::BubbleSort(vector<int> &nums, SortMod mod){
@@ -127,13 +133,19 @@ int Sort::BubbleSort(vector<int> &nums, SortMod mod){
 }
 ```
 
-
+---
 
 ## 2.选择排序
 
+```tex
 稳定性：不稳定
-时间复杂度：O(n^2)
+最好情况：O(n²)
+最坏情况：O(n²)
+平均时间复杂度：O(n²)
 空间复杂度：O(1)
+```
+
+代码实现：
 
 ```cpp
 int Sort::SelectSort(vector<int> &nums, SortMod mod){
@@ -157,13 +169,19 @@ int Sort::SelectSort(vector<int> &nums, SortMod mod){
 }
 ```
 
-
+---
 
 ## 3.插入排序
 
+```tex
 稳定性：稳定
-时间复杂度：O(n^2)
+最好情况：O(n)
+最坏情况：O(n²)
+平均时间复杂度：O(n²)
 空间复杂度：O(1)
+```
+
+代码实现：
 
 ```cpp
 int Sort::InsertSort(vector<int> &nums, SortMod mod){
@@ -183,13 +201,91 @@ int Sort::InsertSort(vector<int> &nums, SortMod mod){
 }
 ```
 
-
+---
 
 ## 4.快速排序
 
-稳定性：不稳定
-时间复杂度：平均O(nlogn)，最坏O(n^2)
-空间复杂度：O(logn)
+```tex
+稳定性：
+最好情况：O(n log n)
+最坏情况：O(n²)
+平均时间复杂度：O(n log n)
+空间复杂度：O(log n)
+```
+
+**最好情况**
+
+每次选择的基准值base都恰好接近当前区间的中间值，数组会被划分成大小接近的两部分，递归过程类似：
+
+```tex
+n
+n / 2 + n / 2
+n / 4 + n / 4 + n / 4 + n / 4
+...
+```
+
+每一层处理的元素总数大约都是 n，递归层数约为：
+
+```tex
+log₂ n
+```
+
+所以：
+
+```tex
+T(n) = O(n) × O(log n)
+```
+
+最终：
+
+```tex
+T(n) = O(n log n)
+```
+
+**最坏情况**
+
+如果每次选择的基准值base都是当前区间的最大值或最小值，那么每次只能排除一个元素，递归过程类似：
+
+```tex
+n
+n - 1
+n - 2
+n - 3
+...
+1
+```
+
+每一层仍然需要进行一次分区，分区成本分别约为：
+
+```tex
+n + (n - 1) + (n - 2) + ... + 1
+```
+
+因此：
+
+```tex
+T(n) = T(n - 1) + O(n)
+```
+
+最终：
+
+```tex
+T(n) = O(n²)
+```
+
+**平均时间复杂度**
+
+这个计算过程不需要特别了解，只需要知道公式是怎么来的以及最终结果属于O(n log n)即可
+
+假设数组长度为n，每次取基准值base恰好为有序数组的第i位，那么递归计算时数组将被分为长度为i和n-i两部分；
+
+无论i取何值，此种划分情况的概率都是相同的；因此计算平均情况就是把每种情况的时间复杂度都相加并除N，得到公式：
+
+![20260914-150636.jpg](20260914-150636.jpg)
+
+D(n)为每层需要比较的次数
+
+**代码实现：**
 
 ```cpp
 void Sort::QuickSort(vector<int> &nums,int left, int right, SortMod mod){
@@ -224,17 +320,21 @@ void Sort::QuickSort(vector<int> &nums,int left, int right, SortMod mod){
 }
 ```
 
-
+---
 
 ## 5.归并排序
 
+```tex
 稳定性：稳定
-
-时间复杂度：O(nlogn)
-
-空间复杂度：O(n)   归并排序需要一个与原数组相同长度的数组做辅助来排序。
+最好情况：O(n log n)
+最坏情况：O(n log n)
+平均时间复杂度：O(n log n)
+空间复杂度：O(n)
+```
 
 归并排序采用分治思想，把待排序序列分成N个子序列，子序列排序后，合并两个子序列实现排序
+
+代码实现：
 
 ```cpp
 void Sort::Merge(vector<int> &nums,int left, int mid, int right, SortMod mod){
@@ -269,19 +369,29 @@ void Sort::MergeSort(vector<int> &nums,int left,int right, SortMod mod){
 
 ```
 
+快排不一定比归并排序快，但在数组原地排序场景中，快排通常实际运行更快。
 
+归并排序会多出：
 
+申请空间、复制元素、释放空间 的耗时操作
 
+归并数据读写次数更多，因此可能更慢。
+
+---
 
 ## 6.希尔排序
 
+```tex
 稳定性：不稳定
-
-时间复杂度：一般介于O(nlogn)和O(n^2)之间
-
+最好情况：O(n log n)
+最坏情况：O(n²)
+平均时间复杂度：一般介于O(nlogn)和O(n^2)之间
 空间复杂度：O(1)
+```
 
 希尔排序是先将任意间隔为N的元素有序，刚开始可以是N=n/2，接着让N=N/2，让N一直缩小，当N=1,时，此时序列间隔为1有序。
+
+代码实现：
 
 ```cpp
 void Sort::ShellSort(vector<int> &nums, SortMod mod){
@@ -300,15 +410,17 @@ void Sort::ShellSort(vector<int> &nums, SortMod mod){
 }
 ```
 
-
+---
 
 ## 7.堆排序
 
+```tex
 稳定性：不稳定
-
-时间复杂度：O(nlogn)
-
+最好情况：O(n log n)
+最坏情况：O(n log n)
+平均时间复杂度：O(n log n)
 空间复杂度：O(1)
+```
 
 大顶堆：arr[i] >= arr[2i+1] && arr[i] >= arr[2i+2]
 
@@ -319,6 +431,8 @@ void Sort::ShellSort(vector<int> &nums, SortMod mod){
 2、将堆顶元素和最后一个元素交换，此时得到新的N-1无序堆和有序序列
 
 3、重复2直到无序堆为1，此时有序序列为N-1
+
+代码实现：
 
 ```cc
 void Sort::HeapBuild(vector<int> &nums,int n,int i, SortMod mod){
@@ -361,17 +475,21 @@ void Sort::HeapSort(vector<int> &nums, SortMod mod){
 }
 ```
 
-
+---
 
 ## 8.计数排序
 
+```tex
 稳定性：稳定
-
-时间复杂度：O(n+k)，k为最大值和最小值的范围
-
-空间复杂度：O(n+k)
+最好情况：O(n + k)，k为最大值和最小值的范围
+最坏情况：O(n + k)，k为最大值和最小值的范围
+平均时间复杂度：O(n + k)，k为最大值和最小值的范围
+空间复杂度：O(n + k)
+```
 
 计数排序适合整数范围较集中的数据，通过统计每个数字出现的次数来确定元素位置。
+
+代码实现：
 
 ```cpp
 void Sort::CountSort(vector<int> &nums, SortMod mod){
@@ -417,15 +535,21 @@ void Sort::CountSort(vector<int> &nums, SortMod mod){
 }
 ```
 
+---
+
 ## 9.基数排序
 
+```tex
 稳定性：稳定
-
-时间复杂度：O(d*n)，d为最大数字位数
-
-空间复杂度：O(n+r)，r为基数，这里是10
+最好情况：O(d(n + k))，d为最大数字位数
+最坏情况：O(d(n + k))
+平均时间复杂度：O(d(n + k))
+空间复杂度：O(n + k)，k为基数，这里是10
+```
 
 基数排序按个位、十位、百位依次进行稳定计数排序，适合整数排序。
+
+代码实现：
 
 ```cpp
 void Sort::RadixSort(vector<int> &nums, SortMod mod){
@@ -495,21 +619,21 @@ void Sort::RadixSort(vector<int> &nums, SortMod mod){
 }
 ```
 
-
-
-
+---
 
 ## 10.桶排序
 
+```tex
 稳定性：取决于桶内排序，这里桶内使用插入排序，整体稳定
-
-时间复杂度：平均O(n+k)，最坏O(n^2)
-
-空间复杂度：O(n+k)
+最好情况：O(n + k)
+最坏情况：最坏O(n^2)
+平均时间复杂度：O(n+k)
+空间复杂度：O(n + k)
+```
 
 桶排序把数据按范围分到多个桶中，桶内排序后再按桶顺序合并。
 
-
+代码实现：
 
 ```cpp
 void Sort::BucketSort(vector<int> &nums, SortMod mod){

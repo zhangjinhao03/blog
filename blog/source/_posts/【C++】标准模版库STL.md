@@ -37,11 +37,118 @@ vector的底层实现原理为**一维数组**
 
 （n），另外当空间不足时还需要进行扩容。
 
-
-
 **使用场景**
 
 适合需要随机访问的场景
+
+**大概实现原理**
+
+```cpp
+#include <cstddef>
+#include <stdexcept>
+
+class DefVector {
+private:
+    int* data_ = nullptr;
+    std::size_t size_ = 0;
+    std::size_t capacity_ = 0;
+
+    // 重新分配更大的连续内存，并复制原有元素。
+    void reallocate(std::size_t newCapacity) {
+        int* newData = new int[newCapacity];
+
+        for (std::size_t i = 0; i < size_; ++i) {
+            newData[i] = data_[i];
+        }
+
+        delete[] data_;
+        data_ = newData;
+        capacity_ = newCapacity;
+    }
+
+public:
+    DefVector() = default;
+
+    ~DefVector() {
+        delete[] data_;
+    }
+
+    // 禁止拷贝，避免多个对象管理同一块内存。
+    DefVector(const DefVector&) = delete;
+    DefVector& operator=(const DefVector&) = delete;
+
+    // 添加元素。
+    void push_back(int value) {
+        if (size_ == capacity_) {
+            const std::size_t newCapacity =
+                capacity_ == 0 ? 1 : capacity_ * 2;
+            reallocate(newCapacity);
+        }
+
+        data_[size_] = value;
+        ++size_;
+    }
+
+    // 删除最后一个元素。
+    void pop_back() {
+        if (size_ > 0) {
+            --size_;
+        }
+    }
+
+    // 使用下标访问元素，不进行边界检查。
+    int& operator[](std::size_t index) {
+        return data_[index];
+    }
+
+    const int& operator[](std::size_t index) const {
+        return data_[index];
+    }
+
+    // 访问元素，进行边界检查。
+    int& at(std::size_t index) {
+        if (index >= size_) {
+            throw std::out_of_range("index out of range");
+        }
+
+        return data_[index];
+    }
+
+    const int& at(std::size_t index) const {
+        if (index >= size_) {
+            throw std::out_of_range("index out of range");
+        }
+
+        return data_[index];
+    }
+
+    // 预先申请容量。
+    void reserve(std::size_t newCapacity) {
+        if (newCapacity > capacity_) {
+            reallocate(newCapacity);
+        }
+    }
+
+    // 清空元素，但不释放已申请的内存。
+    void clear() {
+        size_ = 0;
+    }
+
+    std::size_t size() const {
+        return size_;
+    }
+
+    std::size_t capacity() const {
+        return capacity_;
+    }
+
+    bool empty() const {
+        return size_ == 0;
+    }
+};
+```
+
+---
 
 ### list
 
@@ -66,6 +173,8 @@ list的底层实现原理为**双向链表**
 **使用场景**
 
 适合需要高效的插入和删除，而不关心随机访问
+
+---
 
 ### deque
 
@@ -213,7 +322,30 @@ key不允许重复
 
 ## 算法
 
-- `sort`
+### sort
+
+std::sort底层使用内省排序（Introsort） = 快排 + 堆排 + 插入排序
+
+**1.快排**
+
+主要部分为快速排序，快速排序平均情况下速度很快，通常具有较好的缓存局部性。
+
+**2.堆排序**
+
+**防止快排退化**，快速排序在特殊情况下可能退化为：O(n²) 
+
+因此 Introsort 会限制递归深度：最大递归深度 ≈ 2 × log₂(n)
+
+如果递归深度超过限制，就认为快速排序可能正在退化，此时切换为堆排序：保证最坏复杂度为 O(n log n) 
+
+**3.插入排序：处理小区间**
+
+当待排序区间比较小时，继续使用快速排序的递归和划分反而不划算。
+
+因此通常会切换为插入排序
+
+---
+
 - `find`
 - `binary_search`
 - `lower_bound` / `upper_bound`
