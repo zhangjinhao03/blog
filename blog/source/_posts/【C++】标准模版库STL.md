@@ -202,7 +202,7 @@ list的底层实现原理为**双向链表**
 
 {% endnote %}
 
-
+底层原理为红黑树
 
 
 
@@ -229,6 +229,10 @@ multiset是允许有重复元素的集合
 {% note purple 'fas fa-wand-magic-sparkles' %}
 
 {% endnote %}
+
+底层原理为哈希表
+
+
 
 
 
