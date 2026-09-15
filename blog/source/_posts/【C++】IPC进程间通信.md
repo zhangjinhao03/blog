@@ -2,7 +2,8 @@
 title: 【C++】IPC
 date: 2026-08-04 19:43:05
 tags: [CPP,IPC,Linux]
-categories: Markdown
+categories: CPP
+series: 多线程与并发
 top_img: /img/ipc.png
 cover: /img/ipc.png
 ---

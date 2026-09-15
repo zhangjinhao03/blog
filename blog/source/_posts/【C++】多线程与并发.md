@@ -4,7 +4,7 @@ date: 2026-08-10
 tags:
   - CPP
 categories: CPP
-series: C++知识整理
+series: 多线程与并发
 top_img: /img/img11.png
 cover: /img/img11.png
 ---

@@ -4,8 +4,8 @@ date: 2026-09-07 19:00:02
 tags: [CPP]
 categories: CPP
 series: C++知识整理
-top_img: /img/830179.jpg
-cover: /img/830179.jpg
+top_img: /img/img13.png
+cover: /img/img13.png
 ---
 
 # C++指针与引用

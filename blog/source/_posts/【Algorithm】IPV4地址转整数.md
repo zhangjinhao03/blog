@@ -1,11 +1,11 @@
 ---
 title: 【Algorithm】IPV4地址转整数
 date: 2026-09-08 15:30:02
-tags: [Algorithm,String]
+tags: [Algorithm,String,ACM]
 categories: Algorithm
 series: 每日算法题
-top_img: /img/870135.png
-cover: /img/870135.png
+top_img: /img/img16.png
+cover: /img/img16.png
 ---
 
 # IPV4地址转整数

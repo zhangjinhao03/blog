@@ -1,5 +1,5 @@
 ---
-title: 【C++】资源管理与智能指针
+title: 【C++】智能指针
 date: 2026-08-06 18:43:05
 tags: [CPP,CPP11]
 categories: CPP
@@ -10,11 +10,9 @@ cover: /img/img3.png
 
 # 【C++】资源管理与智能指针
 
-> 当前已学：`unique_ptr`、`shared_ptr`、`weak_ptr`
-
----
-
-# 1. 为什么需要智能指针
+{% note purple 'fas fa-wand-magic-sparkles' %}
+为什么需要智能指针
+{% endnote %}
 
 手动管理内存容易出错：
 
@@ -30,13 +28,15 @@ cover: /img/img3.png
 对象销毁时自动释放资源
 ```
 
-这就是 RAII。
+这就是 **RAII**。
 
 ---
 
-# 2. `unique_ptr`
+## 1. `unique_ptr`
 
-## 2.1 `unique_ptr` 是什么
+{% note purple 'fas fa-wand-magic-sparkles' %}
+`unique_ptr` 是什么
+{% endnote %}
 
 `unique_ptr` 表示：
 
@@ -56,9 +56,9 @@ auto p = std::make_unique<Foo>();
 
 ---
 
-## 2.2 `unique_ptr` 的核心规则
+### `unique_ptr` 的核心规则
 
-### 不能拷贝
+#### 不能拷贝
 
 ```cpp
 std::unique_ptr<int> a = std::make_unique<int>(10);
@@ -75,7 +75,7 @@ unique_ptr 要保证独占所有权
 
 ---
 
-### 可以移动
+#### 可以移动
 
 ```cpp
 std::unique_ptr<int> a = std::make_unique<int>(10);
@@ -95,7 +95,7 @@ std::unique_ptr<int> b = std::move(a);
 
 ---
 
-### 离开作用域自动释放
+#### 离开作用域自动释放
 
 ```cpp
 void f() {
@@ -107,7 +107,7 @@ void f() {
 
 ---
 
-## 2.3 `std::move`
+### `std::move`
 
 `std::move` 本身不移动对象，它只是把左值强制转换成右值，让编译器允许调用移动构造或移动赋值。
 
@@ -122,9 +122,9 @@ auto q = std::move(p);
 
 ---
 
-## 2.4 `unique_ptr` 的三种常见传参方式
+### `unique_ptr` 的三种常见传参方式
 
-### 按值传递
+#### 1.按值传递
 
 适合：函数要接管所有权。
 
@@ -149,7 +149,7 @@ take(std::move(p));
 
 ---
 
-### 按引用传递
+#### 2.按引用传递
 
 适合：函数要修改 `unique_ptr` 本身。
 
@@ -167,7 +167,7 @@ void reset_ptr(std::unique_ptr<Foo>& p) {
 
 ---
 
-### 只读使用对象
+#### 3.只读使用对象
 
 适合：函数只是借用对象，不接管所有权。
 
@@ -199,7 +199,7 @@ use(p.get());
 
 ---
 
-## 2.5 `unique_ptr` 的返回值
+### `unique_ptr` 的返回值
 
 函数可以返回 `unique_ptr`：
 
@@ -230,9 +230,9 @@ std::unique_ptr<Foo> f() {
 
 ---
 
-## 2.6 `get()` / `release()` / `reset()`
+### `get()` / `release()` / `reset()`
 
-### `get()`
+#### `get()`
 
 ```cpp
 T* get() const noexcept;
@@ -259,7 +259,7 @@ Foo* raw = p.get();
 
 ---
 
-### `release()`
+#### `release()`
 
 ```cpp
 T* release() noexcept;
@@ -285,7 +285,7 @@ Foo* raw = p.release();
 
 ---
 
-### `reset()`
+#### `reset()`
 
 ```cpp
 void reset(T* ptr = nullptr) noexcept;
@@ -312,7 +312,7 @@ p.reset();
 
 ---
 
-## 2.7 `unique_ptr` 使用原则
+### `unique_ptr` 使用原则
 
 ```text
 默认优先用 unique_ptr 管理资源
@@ -323,23 +323,11 @@ p.reset();
 
 ---
 
-## 2.8 目前已掌握的结论
+## 2. `shared_ptr`
 
-```text
-unique_ptr = 独占所有权
-不能拷贝，只能移动
-离开作用域自动释放
-返回值可以靠移动或返回值优化交给调用者
-get() 只借用，不交权
-release() 交出所有权
-reset() 释放旧对象，换管新对象
-```
-
----
-
-# 3. `shared_ptr`
-
-## 3.1 `shared_ptr` 是什么
+{% note purple 'fas fa-wand-magic-sparkles' %}
+ `shared_ptr` 是什么
+{% endnote %}
 
 `shared_ptr` 表示：
 
@@ -354,7 +342,7 @@ reset() 释放旧对象，换管新对象
 
 ---
 
-## 3.2 为什么需要 `shared_ptr`
+### 为什么需要 `shared_ptr`
 
 有些场景不是“一个主人”，而是“多个地方都要用同一个对象”。
 
@@ -368,7 +356,7 @@ reset() 释放旧对象，换管新对象
 
 ---
 
-## 3.3 它的核心机制：引用计数
+### 它的核心机制：引用计数
 
 `shared_ptr` 内部维护一个计数器。
 
@@ -378,9 +366,92 @@ reset() 释放旧对象，换管新对象
 - 销毁一个，计数 -1
 - 计数变成 0 时，自动释放对象
 
+std::shared_ptr 的计数器通常保存在堆上的**控制块（Control Block）**中，而不是保存在被管理对象本身，也不是每个 shared_ptr 对象中各保存一份。
+
+```cpp
+std::shared_ptr<int> p1 = std::make_shared<int>(10);
+std::shared_ptr<int> p2 = p1;
+```
+
+可以简化为：
+
+```
+  p1 ─────┐
+          ├──> 控制块
+  p2 ─────┘      ├── 强引用计数
+                 ├── 弱引用计数
+                 ├── 删除器
+                 └── 分配器等信息
+```
+
+控制块 ───> int 对象
+
+### 两种计数器
+
+**强引用计数器**
+
+表示当前有多少个 shared_ptr 共同拥有对象：
+
+```cpp
+auto p1 = std::make_shared<int>(10); // 强引用计数为 1
+auto p2 = p1;
+```
+
+当强引用计数变为 0 时，实际对象被销毁。
+
+**弱引用计数器**
+
+用于管理控制块的生命周期，主要与 weak_ptr 有关。
+
+当
+
+```tex
+强引用计数 == 0
+且弱引用计数 == 0
+```
+
+控制块才会被释放。
+
+强引用计数为 0：销毁实际对象
+
+强、弱引用计数都为 0：释放控制块
+
+**make_shared 的特殊情况**
+
+```cpp
+auto p = std::make_shared<int>(10);
+```
+
+通常会将控制块和实际对象放在同一块内存中：
+
+```tex
+[ 控制块 | int 对象 ]
+```
+
+这样通常只需要一次堆内存分配。
+
+而：
+
+```cpp
+std::shared_ptr<int> p(new int(10));
+```
+
+一般需要分别分配：
+
+```tex
+[ int 对象 ]
+[ 控制块 ]
+```
+
+ 不过无论采用哪种方式，计数器都属于控制块。
+
+> shared_ptr 本身通常可以理解为保存两个指针：
+> 对象指针
+> 控制块指针
+
 ---
 
-## 3.4 最小例子
+### 使用实例
 
 ```cpp
 #include <memory>
@@ -410,9 +481,9 @@ int main() {
 
 ---
 
-## 3.5 `shared_ptr` 的核心规则
+### `shared_ptr` 的核心规则
 
-### 可以拷贝
+#### 可以拷贝
 
 ```cpp
 auto a = std::make_shared<Foo>();
@@ -423,7 +494,7 @@ auto b = a;
 
 ---
 
-### 最后一个销毁时才释放
+#### 最后一个销毁时才释放
 
 ```cpp
 {
@@ -436,7 +507,7 @@ auto b = a;
 
 ---
 
-### `make_shared` 优先使用
+#### `make_shared` 优先使用
 
 ```cpp
 auto p = std::make_shared<Foo>();
@@ -450,9 +521,9 @@ auto p = std::make_shared<Foo>();
 
 ---
 
-## 3.6 `shared_ptr` 传参方式
+### `shared_ptr` 传参方式
 
-### 按值传递
+#### 按值传递
 
 适合：函数需要共享这份所有权。
 
@@ -476,7 +547,7 @@ f(p);
 
 ---
 
-### 按引用传递
+#### 按引用传递
 
 适合：函数要修改这个 `shared_ptr` 本身。
 
@@ -488,7 +559,7 @@ void reset_ptr(std::shared_ptr<Foo>& p) {
 
 ---
 
-### 只读借用
+#### 只读借用
 
 如果函数只是看对象，不想增加引用计数，通常传：
 
@@ -508,7 +579,7 @@ void use(Foo* p) {
 
 ---
 
-## 3.7 `use_count()`
+### `use_count()`
 
 ```cpp
 std::cout << p.use_count() << std::endl;
@@ -528,7 +599,7 @@ std::cout << a.use_count() << std::endl; // 2
 
 ---
 
-## 3.8 `shared_ptr` 的坑：循环引用
+### 循环引用
 
 这是最重要的坑。
 
@@ -558,7 +629,7 @@ struct B {
 
 ---
 
-## 3.9 `shared_ptr` 不能乱用
+### `shared_ptr` 不能乱用
 
 `shared_ptr` 很方便，但不能滥用。
 
@@ -579,18 +650,7 @@ struct B {
 
 ---
 
-## 3.10 目前已掌握的结论
-
-```text
-shared_ptr = 共享所有权
-拷贝 shared_ptr 会增加引用计数
-最后一个 shared_ptr 销毁时对象才释放
-循环引用会导致内存泄漏
-```
-
----
-
-## 3.11 和 unique_ptr 的区别
+### `shared_ptr` 和 unique_ptr 的区别
 
 ```text
 unique_ptr：一个对象只有一个拥有者
@@ -603,9 +663,11 @@ shared_ptr：一个对象可以有多个拥有者
 
 ---
 
-# 4. `weak_ptr`
+## 3. `weak_ptr`
 
-## 4.1 `weak_ptr` 是什么
+{% note purple 'fas fa-wand-magic-sparkles' %}
+ `weak_ptr` 是什么
+{% endnote %}
 
 `weak_ptr` 是配合 `shared_ptr` 使用的。
 
@@ -623,7 +685,7 @@ weak_ptr 不增加引用计数
 
 ---
 
-## 4.2 为什么需要 `weak_ptr`
+### 为什么需要 `weak_ptr`
 
 因为 `shared_ptr` 有一个重要问题：循环引用。
 
@@ -670,7 +732,7 @@ A 和 B 都不会析构，发生内存泄漏
 
 ---
 
-## 4.3 用 `weak_ptr` 打破循环引用
+### 用 `weak_ptr` 打破循环引用
 
 正确模型：
 
@@ -715,7 +777,7 @@ weak_ptr 不阻止对象被释放
 
 ---
 
-## 4.4 `weak_ptr` 不能直接访问对象
+### `weak_ptr` 不能直接访问对象
 
 因为 `weak_ptr` 不拥有对象，对象可能已经被释放。
 
@@ -734,7 +796,7 @@ lock()
 
 ---
 
-## 4.5 `lock()`
+### `lock()`
 
 ```cpp
 std::shared_ptr<T> lock() const noexcept;
@@ -770,7 +832,7 @@ if (auto s = w.lock()) {
 
 ---
 
-## 4.6 `expired()`
+### `expired()`
 
 ```cpp
 bool expired() const noexcept;
@@ -800,9 +862,9 @@ if (auto s = w.lock()) {
 
 ---
 
-## 4.7 `weak_ptr` 的典型用途
+### `weak_ptr` 的典型用途
 
-### 解决循环引用
+**解决循环引用**
 
 父子关系、双向关系中经常用：
 
@@ -818,9 +880,7 @@ Parent 拥有 Child
 Child 观察 Parent
 ```
 
----
-
-### 缓存
+**缓存**
 
 缓存里可以保存一个对象的弱引用：
 
@@ -829,9 +889,7 @@ Child 观察 Parent
 如果对象已经释放，就重新创建
 ```
 
----
-
-### 观察者模式
+**观察者模式**
 
 观察者不一定拥有被观察对象。
 
@@ -841,31 +899,3 @@ Child 观察 Parent
 weak_ptr 表示观察关系
 ```
 
----
-
-## 4.8 三者关系
-
-```text
-unique_ptr：独占拥有
-shared_ptr：共享拥有
-weak_ptr：只观察，不拥有
-```
-
-判断方式：
-
-```text
-谁负责对象生命周期？用 unique_ptr / shared_ptr
-谁只是知道它、观察它？用 weak_ptr / 裸指针 / 引用
-```
-
----
-
-## 4.9 目前已掌握的结论
-
-```text
-weak_ptr 不增加引用计数
-weak_ptr 不能直接访问对象
-weak_ptr 要通过 lock() 临时变成 shared_ptr
-weak_ptr 主要用来解决 shared_ptr 循环引用
-weak_ptr 不阻止对象被释放
-```

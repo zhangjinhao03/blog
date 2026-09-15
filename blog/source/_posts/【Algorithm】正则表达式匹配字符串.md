@@ -1,11 +1,11 @@
 ---
 title: 【Algorithm】正则表达式匹配字符串
 date: 2026-09-10 14:54:03
-tags: [Algorithm,String]
+tags: [Algorithm,String,ACM]
 categories: Algorithm
 series: 每日算法题
-top_img: /img/870135.png
-cover: /img/870135.png
+top_img: /img/img17.png
+cover: /img/img17.png
 ---
 
 {% note purple 'fas fa-wand-magic-sparkles' %}
